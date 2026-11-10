@@ -128,6 +128,20 @@ textarea{min-height:110px;resize:vertical}
 details summary{cursor:pointer;font-weight:700;min-height:40px;display:flex;align-items:center}
 footer{padding-block:24px 40px;color:var(--muted);font-size:14px}
 select{font:inherit;font-size:16px;padding:8px 10px;border-radius:10px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);max-width:100%}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:10px}
+.tabs .chip{min-height:44px;font-size:16px}
+.words-check{display:flex;flex-wrap:wrap;gap:6px;font-family:var(--f-display);font-size:20px;font-weight:700}
+.words-check span{padding:2px 8px;border-radius:8px}
+.words-check .hit{background:var(--good-soft);color:var(--good)}
+.words-check .miss{background:var(--warn-soft);color:var(--warn);text-decoration:underline dotted}
+.live{font-family:var(--f-display);font-size:19px;min-height:1.5em;color:var(--muted)}
+.echo{font-weight:700;color:var(--accent);min-height:1.4em}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.soundgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:12px}
+.soundcard{text-align:left;font:inherit;color:var(--ink);background:var(--surface);border:1.5px solid var(--line);border-radius:var(--r);padding:16px;cursor:pointer;display:flex;flex-direction:column;gap:6px;min-height:110px}
+.soundcard:hover{border-color:var(--primary)}
+.soundcard .big{font-family:var(--f-display);font-weight:800;font-size:26px;color:var(--primary)}
+.qa{font-family:var(--f-display);font-size:clamp(26px,7vw,34px);font-weight:800;line-height:1.15}
 @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
 </style>
 
@@ -217,6 +231,56 @@ const WHO = {
   "mi amiga":{en:"my friend (she)", end:"-a", why:"Mi amiga is one person, like ella (she). The verb ends in -a."},
   "mi hermana":{en:"my sister (she)", end:"-a", why:"Mi hermana is like ella (she). The verb ends in -a."}
 };
+/* Sound lab: the sounds English speakers usually find hard. pairs = [word A, meaning A, word B, meaning B] */
+const SOUNDS = [
+  {id:"vowels", big:"a e i o u", title:"Five pure vowels", short:"Short and steady. No glide.",
+   what:"Spanish has five vowels, and each one always sounds the same. English vowels often glide (“no” becomes “noh-oo”). In Spanish, keep your mouth still until the vowel ends.",
+   tip:"Say “no” in Spanish: stop on a short, round o. Don’t add an “oo” at the end.",
+   ex:[{es:"casa",en:"house"},{es:"mesa",en:"table"},{es:"sí",en:"yes"},{es:"todo",en:"everything"},{es:"tú",en:"you"}], pairs:[]},
+  {id:"r", big:"r · rr", title:"Tap r and rolled rr", short:"pero is not perro.",
+   what:"A single r between vowels is one quick tap of your tongue, like the tt in American “butter”. A double rr (and an r at the start of a word) is rolled: several taps in a row.",
+   tip:"For the tap, say “butter” fast, then “pero”. For rr, rest your tongue behind your top teeth and blow so it flutters. It takes practice, so keep trying.",
+   ex:[{es:"pero",en:"but"},{es:"perro",en:"dog"},{es:"preparar",en:"to prepare"},{es:"rápido",en:"fast"}],
+   pairs:[["pero","but","perro","dog"],["caro","expensive","carro","car"]]},
+  {id:"j", big:"j · ge · gi", title:"The breathy j", short:"Like a strong h.",
+   what:"j, and g before e or i, is a breathy sound from the back of your throat, like a strong English h. It is never the English j in “jump”.",
+   tip:"Whisper a strong “h” as if you’re fogging up a mirror. That’s close to dibujar, gente and página.",
+   ex:[{es:"dibujar",en:"to draw"},{es:"jugar",en:"to play"},{es:"gente",en:"people"},{es:"página",en:"page"}], pairs:[]},
+  {id:"h", big:"h", title:"Silent h", short:"Write it. Don’t say it.",
+   what:"The letter h is always silent in Spanish.",
+   tip:"hola sounds like “OH-lah”. hermana sounds like “ehr-MAH-nah”.",
+   ex:[{es:"hola",en:"hello"},{es:"hermana",en:"sister"},{es:"hablar",en:"to talk"}], pairs:[]},
+  {id:"d", big:"d", title:"Soft d", short:"Between vowels it’s soft.",
+   what:"Between vowels, d is soft, close to the th in “this”. At the start of a sentence it’s a normal d, with the tongue touching the back of the top teeth.",
+   tip:"In nada and todo, let your tongue barely touch your teeth. Don’t make a hard American d.",
+   ex:[{es:"nada",en:"nothing"},{es:"todo",en:"everything"},{es:"estudiar",en:"to study"}], pairs:[]},
+  {id:"bv", big:"b = v", title:"b and v sound the same", short:"vamos ≈ bamos.",
+   what:"In Spanish, b and v are the same sound. Between vowels, the lips barely touch.",
+   tip:"Don’t bite your lip for v. vamos and bueno start with the same sound.",
+   ex:[{es:"vamos",en:"let’s go"},{es:"bueno",en:"good"},{es:"la verdad",en:"the truth"}], pairs:[]},
+  {id:"ny", big:"ñ", title:"The ñ", short:"Close to “ny” in canyon.",
+   what:"ñ is close to the “ny” in “canyon”, said as one smooth sound.",
+   tip:"Press the middle of your tongue up to the roof of your mouth. Listen to the model, because the English comparison is only close.",
+   ex:[{es:"español",en:"Spanish"},{es:"mañana",en:"tomorrow"},{es:"año",en:"year"}], pairs:[]},
+  {id:"stress", big:"á é í ó ú", title:"Stress and accent marks", short:"The mark shows the strong part.",
+   what:"Words ending in a vowel, n or s are strong on the second-to-last syllable: es-CUE-la. Other words are strong on the last one: es-tu-DIAR. An accent mark breaks the rule and shows you where the strong part is: MÚ-si-ca.",
+   tip:"Moving the stress can change the meaning: papa (potato) and papá (dad).",
+   ex:[{es:"música",en:"music"},{es:"fútbol",en:"soccer"},{es:"papá",en:"dad"}],
+   pairs:[["papa","potato","papá","dad"],["hablo","I talk","habló","he talked"]]},
+  {id:"link", big:"mi‿amigo", title:"Linking words", short:"Words flow together.",
+   what:"Spanish speakers link words. When one word ends in a vowel and the next starts with one, they join: mi amigo sounds like “mya-MEE-goh”.",
+   tip:"Say the phrase as one word. Don’t stop between words.",
+   ex:[{es:"mi amigo",en:"my friend"},{es:"tú escuchas",en:"you listen"},{es:"Yo estudio español.",en:"I study Spanish."}], pairs:[]}
+];
+/* Conversation: question → answer out loud → model answer */
+const TALK = [
+  {q:"¿Qué estudias?", qEn:"What do you study?", a:"Yo estudio español.", aEn:"I study Spanish.", frame:"Yo estudio ___.", help:"Answer with yo + estudio. Then add what you study: español, música, arte…"},
+  {q:"¿Escuchas música?", qEn:"Do you listen to music?", a:"Sí, escucho música.", aEn:"Yes, I listen to music.", frame:"Sí, escucho ___.", help:"Sí = yes. With yo you can skip the word yo: escucho = I listen. To say no: No, no escucho música."},
+  {q:"¿Qué practicas?", qEn:"What do you practice?", a:"Practico fútbol.", aEn:"I practice soccer.", frame:"Practico ___.", help:"Practico = I practice. Add your sport or hobby: fútbol, básquetbol, la guitarra."},
+  {q:"¿Tu amigo practica fútbol?", qEn:"Does your friend play soccer?", a:"Sí, mi amigo practica fútbol.", aEn:"Yes, my friend plays soccer.", frame:"Sí, mi amigo practica ___.", help:"Mi amigo is like él (he), so use practica, ending in -a."},
+  {q:"¿Dibujas?", qEn:"Do you draw?", a:"Sí, dibujo.", aEn:"Yes, I draw.", frame:"Sí, dibujo. / No, no dibujo.", help:"Dibujo = I draw. No, no dibujo = No, I don’t draw. Both are good answers."},
+  {q:"¿Qué escucha tu hermana?", qEn:"What does your sister listen to?", a:"Mi hermana escucha música.", aEn:"My sister listens to music.", frame:"Mi hermana escucha ___.", help:"Mi hermana is like ella (she), so use escucha, ending in -a. No sister? Say mi amigo or mi amiga."}
+];
 const STEP_NAMES = ["Learn words","Build a sentence","Listen & repeat","Your mini project","See your progress"];
 
 /* ============ STORAGE ============ */
@@ -240,7 +304,7 @@ let flashT;
 function flash(t){const el=document.getElementById("savestate"); el.textContent=t; clearTimeout(flashT); flashT=setTimeout(()=>el.textContent="",1400);}
 
 /* ============ UI STATE (not saved) ============ */
-const ui = {view:"home", w:{i:0, phase:0}, gram:"learn", ph:0, run:null, review:{i:0, show:false, filter:"all"}, help:false, open:null, confirmReset:false};
+const ui = {lsTab:"items", sound:null, quiz:null, talk:{i:0, phase:0}, echo:null, view:"home", w:{i:0, phase:0}, gram:"learn", ph:0, run:null, review:{i:0, show:false, filter:"all"}, help:false, open:null, confirmReset:false};
 
 /* ============ HELPERS ============ */
 const $ = s=>document.querySelector(s);
@@ -269,9 +333,13 @@ const Voice = {
     setTimeout(()=>{ if(!this.loaded){ this.loaded = true; if(ui.view==="listen") render(); } }, 2500);
   },
   pick(){ return this.list.find(v=>v.voiceURI===DB.voice) || this.list[0] || null; },
-  speak(text, rate){
-    if(!this.ok){ toast("This browser can’t play spoken audio. You can still read the words and the sound guide."); return; }
-    Rec.stop();
+  speak(text, rate, onend){
+    this.seq = null; setEcho(null);
+    return this._speak(text, rate, onend);
+  },
+  _speak(text, rate, onend){
+    if(!this.ok){ toast("This browser can’t play spoken audio. You can still read the words and the sound guide."); return false; }
+    Rec.stop(); Check.stop();
     try{
       speechSynthesis.cancel();
       const u = new SpeechSynthesisUtterance(text);
@@ -279,12 +347,133 @@ const Voice = {
       if(v){ u.voice = v; u.lang = v.lang; } else { u.lang = "es-MX"; }
       u.rate = rate || 1;
       u.onerror = e=>{ if(e.error!=="canceled" && e.error!=="interrupted") toast("The audio didn’t play. Check that your sound is on and try again."); };
+      if(onend) u.onend = onend;
       speechSynthesis.speak(u);
       if(this.loaded && !this.list.length) toast("This device has no Spanish voice, so the audio may sound wrong. Ask your tutor how to add one.");
-    }catch(e){ toast("The audio didn’t play. Try again."); }
+      return true;
+    }catch(e){ toast("The audio didn’t play. Try again."); return false; }
   },
-  stop(){ if(this.ok) try{speechSynthesis.cancel();}catch(e){} }
+  /* Repeat after me: slow → medium → normal, with a pause to repeat after each */
+  echo(text, key){
+    this.stop();
+    if(!this.ok){ toast("This browser can’t play spoken audio, so Repeat after me isn’t available. Read the sound guide and say it out loud."); return; }
+    const rates = [0.6, 0.8, 1], token = {}; let i = 0;
+    this.seq = token;
+    const gap = Math.max(1800, text.length * 110);
+    const next = ()=>{
+      if(this.seq!==token) return;
+      if(i>=rates.length){ this.seq = null; setEcho({key, done:true}); return; }
+      setEcho({key, n:i+1, phase:"listen"});
+      this._speak(text, rates[i], ()=>{
+        if(this.seq!==token) return;
+        setEcho({key, n:i+1, phase:"you"});
+        setTimeout(()=>{ i++; next(); }, gap);
+      });
+    };
+    next();
+  },
+  stop(){ this.seq = null; if(this.ok) try{speechSynthesis.cancel();}catch(e){} }
 };
+
+function setEcho(st){
+  ui.echo = st;
+  document.querySelectorAll("[data-echo]").forEach(el=>{
+    if(!st || st.key!==el.dataset.echo){ el.textContent = ""; return; }
+    el.textContent = st.done ? "Nice. Do it again anytime." : st.phase==="listen" ? `Listen (${st.n} of 3${st.n===1?", slow":st.n===2?", a bit faster":", normal speed"})…` : `Your turn. Say it out loud now (${st.n} of 3).`;
+  });
+}
+function echoRow(text, key){
+  return `<div class="stack-sm"><div class="row"><button class="btn" data-a="echo" data-t="${esc(text)}" data-k="${key}">↻ Repeat after me</button></div>
+    <p class="echo" data-echo="${key}" aria-live="polite"></p></div>`;
+}
+
+/* ============ WORD CHECK (speech to text) ============ */
+const Check = {
+  dict:null, SR:(window.SpeechRecognition || window.webkitSpeechRecognition || null), rec:null,
+  active:false, key:null, expected:"", partial:"", final:"", heard:{},
+  init(){
+    try{
+      if(window.claude && typeof window.claude.use==="function"){
+        window.claude.use("dictation").then(d=>{
+          if(!d) return;
+          this.dict = d;
+          d.onPartial(e=>{ this.partial = e.text; this.live(); });
+          d.onFinal(e=>{ this.final += e.text; this.live(); });
+          d.onState(e=>{
+            if(e.state==="idle" && this.active){
+              this.active = false;
+              if(e.reason && !["stopped","viewer_stopped","hidden"].includes(e.reason)) this.fail(e.reason);
+              this.finish();
+            }
+          });
+          render();
+        }).catch(()=>{});
+      }
+    }catch(e){}
+  },
+  available(){ return !!(this.dict || this.SR); },
+  start(key, expected){
+    Voice.stop(); Rec.stop();
+    this.key = key; this.expected = expected; this.partial = ""; this.final = ""; delete this.heard[key];
+    this.active = true;
+    if(this.dict){
+      this.dict.start({language:"es-MX"}).catch(e=>{ this.active = false; this.fail(e && e.code); render(); });
+      render(); return;
+    }
+    try{
+      const r = new this.SR(); this.rec = r;
+      r.lang = "es-MX"; r.interimResults = true; r.continuous = false; r.maxAlternatives = 1;
+      r.onresult = e=>{ let f = "", p = ""; for(let i=0;i<e.results.length;i++){ const x = e.results[i]; if(x.isFinal) f += x[0].transcript; else p += x[0].transcript; } this.final = f; this.partial = p; this.live(); };
+      r.onerror = e=>{ if(e.error!=="aborted" && e.error!=="no-speech") this.fail(e.error); if(e.error==="no-speech") toast("We didn’t hear anything. Tap Check my words and speak right after."); };
+      r.onend = ()=>{ if(this.active){ this.active = false; this.finish(); } };
+      r.start(); render();
+    }catch(e){ this.active = false; this.fail("start"); render(); }
+  },
+  stop(){
+    if(!this.active) return;
+    if(this.dict){ this.dict.stop().catch(()=>{}); }
+    else if(this.rec){ try{ this.rec.stop(); }catch(e){} }
+  },
+  live(){ const el = document.getElementById("chk-live"); if(el) el.textContent = (this.final + " " + this.partial).trim() || "Listening… say it now."; },
+  finish(){ const t = (this.final + " " + this.partial).trim(); if(t) this.heard[this.key] = t; render(); },
+  fail(code){
+    const m = (code==="not_granted" || code==="not-allowed" || code==="service-not-allowed") ? "Microphone access is off, so the word check is skipped. You can still listen and repeat out loud."
+      : code==="unavailable" ? "The word check isn’t available here. You can still listen and repeat out loud."
+      : code==="rate_limited" ? "The word check is busy. Wait a moment and try again."
+      : code==="dismissed" ? "No problem. Tap Check my words when you’re ready."
+      : code==="network" ? "The word check needs an internet connection. Try again when you’re online."
+      : "The word check didn’t work this time. Try again, or just repeat out loud.";
+    toast(m);
+  }
+};
+function norm(w){ return w.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9ñ]/g,""); }
+function compareWords(expected, heard){
+  const hw = heard.split(/\s+/).map(norm).filter(Boolean);
+  let j = 0;
+  return expected.split(/\s+/).filter(Boolean).map(w=>{
+    const n = norm(w); let k = hw.indexOf(n, j);
+    if(k<0) k = hw.indexOf(n);
+    if(k>=0){ j = k+1; return {w, hit:true}; }
+    return {w, hit:false};
+  });
+}
+function checkRow(key, expected){
+  if(!Check.available()) return `<p class="small muted">Word check (speech to text) isn’t available in this browser. Listen and repeat out loud instead.</p>`;
+  if(Check.active && Check.key===key){
+    return `<div class="stack-sm"><p class="live" id="chk-live" aria-live="polite">Listening… say it now.</p>
+      <div class="row"><button class="btn primary" data-a="chkstop">■ I’m done</button></div></div>`;
+  }
+  const h = Check.heard[key];
+  let out = `<div class="row"><button class="btn" data-a="chk" data-k="${key}" data-t="${esc(expected)}">🎙 Check my words</button></div>`;
+  if(h){
+    const cmp = compareWords(expected, h), miss = cmp.filter(x=>!x.hit).map(x=>x.w.replace(/[¿?¡!.,]/g,""));
+    out += `<div class="stack-sm"><span class="label">We heard</span><p lang="es">“${esc(h)}”</p>
+      <div class="words-check" lang="es">${cmp.map(x=>`<span class="${x.hit?"hit":"miss"}">${esc(x.w)}</span>`).join("")}</div>
+      <p class="${miss.length?"tip":"fb ok"}">${miss.length ? `We didn’t catch: <strong lang="es">${esc(miss.join(", "))}</strong>. Listen to the model and try those words again.` : "We understood every word. Nice!"}</p>
+      <p class="small muted">This checks whether your words were understood. It doesn’t grade your accent.</p></div>`;
+  }
+  return `<div class="stack-sm">${out}</div>`;
+}
 
 /* ============ RECORDER (optional, local only) ============ */
 const Rec = {
@@ -327,7 +516,7 @@ const Rec = {
   play(key){ const u = this.urls[key]; if(!u) return; Voice.stop(); const a = new Audio(u); a.play().catch(()=>toast("Your recording didn’t play. Try recording again.")); },
   clearAll(){ this.stop(); this.release(); Object.values(this.urls).forEach(u=>URL.revokeObjectURL(u)); this.urls = {}; }
 };
-function stopMedia(){ Voice.stop(); Rec.stop(); }
+function stopMedia(){ Voice.stop(); setEcho(null); Rec.stop(); Check.stop(); }
 
 /* ============ EXERCISE RUNS ============ */
 function bank(kind){
@@ -533,6 +722,8 @@ function phraseCard(ph, key){
       <button class="btn primary" data-a="say" data-t="${esc(ph.es)}"><span class="ico" aria-hidden="true">🔊</span>Listen</button>
       <button class="btn" data-a="say" data-t="${esc(ph.es)}" data-r="0.6">Play slowly</button>
     </div>
+    ${echoRow(ph.es, key)}
+    ${checkRow(key, ph.es)}
     <div class="stack-sm">
       <span class="label">Optional · record yourself</span>
       <div class="rec">
@@ -644,7 +835,7 @@ function finishSummary(){
     </div>
     <div class="card stack-sm">
       <h3>Next activity</h3>
-      <p>Spend 5 minutes in <a href="#words" data-nav="words">Words</a> reviewing the ones marked “Still learning”, then say the 4 sentences in <a href="#listen" data-nav="listen">Listen &amp; speak</a>.</p>
+      <p>Spend 5 minutes in <a href="#words" data-nav="words">Words</a> reviewing the ones marked “Still learning”, then answer the questions in <a href="#listen" data-nav="listen">Listen &amp; speak</a> › Conversation.</p>
     </div>
     <div class="row"><button class="btn primary big" data-a="finishlesson">Finish lesson</button><a class="btn" href="#progress" data-nav="progress">See my progress</a></div>
   </div>`;
@@ -705,19 +896,83 @@ function viewPractice(){
 }
 
 function viewListen(){
+  const tabs = `<div class="tabs" role="tablist" aria-label="Listen and speak">
+    ${[["items","Words & sentences"],["sounds","Sound lab"],["talk","Conversation"]].map(([k,n])=>`<button class="chip ${ui.lsTab===k?"on":""}" role="tab" aria-selected="${ui.lsTab===k}" data-a="lstab" data-k="${k}">${n}</button>`).join("")}</div>`;
+  const body = ui.lsTab==="sounds" ? viewSounds() : ui.lsTab==="talk" ? viewTalk() : viewItems();
+  return `<div class="stack"><h2>Listen &amp; speak</h2>${tabs}${voiceNote()}${body}</div>`;
+}
+function voiceNote(){
+  if(!Voice.ok) return `<p class="banner">This browser can’t play spoken audio. You can still use the sound guides.</p>`;
+  if(Voice.loaded && !Voice.list.length) return `<p class="banner">This device has no Spanish voice, so the audio may sound wrong. On iPhone: Settings › Accessibility › Spoken Content › Voices › Spanish (Mexico).</p>`;
+  if(Voice.list.length>1) return `<div class="row"><label for="voicesel" class="small muted">Voice</label><select id="voicesel" data-a="voice">${Voice.list.map(v=>`<option value="${esc(v.voiceURI)}" ${Voice.pick()===v?"selected":""}>${esc(v.name)} (${esc(v.lang)})</option>`).join("")}</select></div>`;
+  return "";
+}
+function viewSounds(){
+  if(!ui.sound){
+    return `<p class="muted">These are the Spanish sounds English speakers find hardest. Pick one to listen, practice and test your ear.</p>
+      <div class="soundgrid">${SOUNDS.map(sd=>{const r = prog().sounds && prog().sounds[sd.id];
+        return `<button class="soundcard" data-a="sopen" data-k="${sd.id}"><span class="big" lang="es">${esc(sd.big)}</span><strong>${esc(sd.title)}</strong><span class="small muted">${esc(sd.short)}</span>${r?`<span class="badge good">Ear test: ${r.right} of ${r.total}</span>`:""}</button>`;}).join("")}</div>`;
+  }
+  const sd = SOUNDS.find(x=>x.id===ui.sound);
+  let quiz = "";
+  if(sd.pairs.length){
+    const q = ui.quiz;
+    quiz = `<div class="card stack"><h3>Which one did you hear?</h3>
+      <p class="small muted">Tap Play a word, listen, then choose. This trains your ear.</p>
+      <div class="row"><button class="btn primary" data-a="qplay">${q && q.target && !q.picked ? "🔊 Play it again" : "🔊 Play a word"}</button>${q && q.total ? `<span class="badge">This round: ${q.right} of ${q.total}</span>` : ""}</div>
+      ${q && q.target ? `<div class="pair">${[0,2].map(o=>{const p = sd.pairs[q.pair]; const w = p[o], m = p[o+1];
+          const cls = q.picked ? (w===q.target ? "right" : q.picked===w ? "wrong" : "") : "";
+          return `<button class="opt ${cls}" lang="es" data-a="qpick" data-v="${esc(w)}" ${q.picked?"disabled":""}>${esc(w)}<br><span class="small muted" lang="en">${esc(m)}</span></button>`;}).join("")}</div>` : ""}
+      ${q && q.picked ? `<div class="fb ${q.picked===q.target?"ok":"no"}"><strong>${q.picked===q.target?"Right!":"Not this time."}</strong>That was <span lang="es">${esc(q.target)}</span>. Listen to both and hear the difference.</div>
+        <div class="row">${[0,2].map(o=>`<button class="btn" data-a="say" data-t="${esc(sd.pairs[q.pair][o])}" data-r="0.8">🔊 ${esc(sd.pairs[q.pair][o])}</button>`).join("")}<button class="btn primary" data-a="qplay">Next word</button></div>` : ""}
+    </div>`;
+  }
+  return `<div class="stack">
+    <button class="btn ghost" data-a="sclose" style="align-self:flex-start">← All sounds</button>
+    <div class="card stack"><span class="big es-md" lang="es" style="color:var(--primary)">${esc(sd.big)}</span><h3>${esc(sd.title)}</h3>
+      <p>${esc(sd.what)}</p><p class="tip">${esc(sd.tip)}</p></div>
+    <div class="list">${sd.ex.map((x,i)=>`<div class="card stack-sm"><div class="item"><div><p class="es-md" lang="es" style="font-size:24px">${esc(x.es)}</p><p class="muted">${esc(x.en)}</p></div>
+      <div class="row"><button class="btn" data-a="say" data-t="${esc(x.es)}">🔊 Listen</button><button class="btn" data-a="say" data-t="${esc(x.es)}" data-r="0.6">Slow</button></div></div>
+      ${echoRow(x.es, "s-"+sd.id+i)}${checkRow("s-"+sd.id+i, x.es)}</div>`).join("")}</div>
+    ${quiz}
+  </div>`;
+}
+function viewTalk(){
+  const i = Math.min(ui.talk.i, TALK.length-1), t = TALK[i], ph = ui.talk.phase, key = "t"+i;
+  return `<div class="stack">
+    <p class="muted">Have a short conversation. Listen to the question, answer out loud, then compare with a model answer. Any answer that makes sense is good.</p>
+    <span class="eyebrow">Question ${i+1} of ${TALK.length}</span>
+    <div class="card stack">
+      <p class="qa" lang="es">${esc(t.q)}</p>
+      <div class="row"><button class="btn primary" data-a="say" data-t="${esc(t.q)}">🔊 Listen to the question</button><button class="btn" data-a="say" data-t="${esc(t.q)}" data-r="0.6">Slow</button>
+        <button class="btn ghost" data-a="tmean" ${ph>=1?"disabled":""}>Show meaning</button></div>
+      ${ph>=1 ? `<p class="note">${esc(t.qEn)}</p>` : ""}
+    </div>
+    <div class="card stack">
+      <span class="label">Your answer · say it out loud</span>
+      <p class="es-md" lang="es" style="font-size:22px">${esc(t.frame)}</p>
+      <div><button class="btn ghost" data-a="thelp" aria-expanded="${!!ui.talk.help}">${ui.talk.help?"Hide help":"I need help"}</button>${ui.talk.help?`<p class="tip">${esc(t.help)}</p>`:""}</div>
+      ${checkRow(key, t.a)}
+      ${Check.heard[key] ? `<p class="small muted">The check compares with the model answer. Your own answer can be different and still be right.</p>` : ""}
+    </div>
+    <div class="card stack">
+      ${ph>=2 ? `<span class="label">Model answer</span><p class="es-md" lang="es" style="font-size:22px">${esc(t.a)}</p><p class="muted">${esc(t.aEn)}</p>
+        <div class="row"><button class="btn" data-a="say" data-t="${esc(t.a)}">🔊 Listen</button><button class="btn" data-a="say" data-t="${esc(t.a)}" data-r="0.6">Slow</button></div>${echoRow(t.a, "ta"+i)}`
+        : `<div class="row"><button class="btn" data-a="tmodel">Show a model answer</button></div>`}
+    </div>
+    <div class="row" style="justify-content:space-between"><button class="btn ghost" data-a="tprev" ${i===0?"disabled":""}>← Previous</button>
+      <button class="btn primary" data-a="tnext">${i+1<TALK.length?"Next question →":"Start again"}</button></div>
+  </div>`;
+}
+function viewItems(){
   const L = lesson();
   const items = L.words.map((w,i)=>({k:"w"+i, es:w.es, en:w.en, guide:w.guide, tip:w.tip})).concat(L.phrases.map((p,i)=>({k:"ph"+i, es:p.es, en:p.en, guide:p.guide, tip:p.tip, phrase:true})));
-  let voiceUI = "";
-  if(!Voice.ok) voiceUI = `<p class="banner">This browser can’t play spoken audio. You can still use the sound guides.</p>`;
-  else if(Voice.loaded && !Voice.list.length) voiceUI = `<p class="banner">This device has no Spanish voice, so the audio may sound wrong. On iPhone: Settings › Accessibility › Spoken Content › Voices › Spanish (Mexico).</p>`;
-  else if(Voice.list.length>1) voiceUI = `<div class="row"><label for="voicesel" class="small muted">Voice</label><select id="voicesel" data-a="voice">${Voice.list.map(v=>`<option value="${esc(v.voiceURI)}" ${Voice.pick()===v?"selected":""}>${esc(v.name)} (${esc(v.lang)})</option>`).join("")}</select></div>`;
-  return `<div class="stack"><h2>Listen &amp; speak</h2>
-    <p class="muted">Listen first. Then say it out loud. Tap Practice to see the sound guide and record yourself.</p>
-    ${voiceUI}
+  return `<div class="stack">
+    <p class="muted">Listen first. Then say it out loud. Tap Practice for the sound guide, Repeat after me, the word check and recording.</p>
     <div class="list">${items.map(it=>`<div class="card stack-sm">
       <div class="item"><div><p class="${it.phrase?"es-md":"es-md"}" lang="es" style="font-size:${it.phrase?22:24}px">${esc(it.es)}</p><p class="muted">${esc(it.en)}</p></div>
       <div class="row"><button class="btn" data-a="say" data-t="${esc(it.es)}" aria-label="Listen to ${esc(it.es)}">🔊 Listen</button><button class="btn" data-a="say" data-t="${esc(it.es)}" data-r="0.6">Slow</button><button class="btn ghost" data-a="lopen" data-k="${it.k}" aria-expanded="${ui.open===it.k}">${ui.open===it.k?"Close":"Practice"}</button></div></div>
-      ${ui.open===it.k ? `<div class="stack-sm"><span class="label">Sound guide · approximate</span><span class="guide">${it.guide}</span><p class="tip">${esc(it.tip)}</p>${recRow(it.k)}</div>` : ""}
+      ${ui.open===it.k ? `<div class="stack-sm"><span class="label">Sound guide · approximate</span><span class="guide">${it.guide}</span><p class="tip">${esc(it.tip)}</p>${echoRow(it.es, it.k)}${checkRow(it.k, it.es)}<span class="label">Optional · record yourself</span>${recRow(it.k)}</div>` : ""}
     </div>`).join("")}</div></div>`;
 }
 function recRow(key){
@@ -740,6 +995,7 @@ function viewProgress(){
         <div class="stat"><span>Words practiced</span><b>${p.wordsSeen.length} of ${L.words.length}</b></div>
         <div class="stat"><span>Sentences said out loud</span><b>${p.phrasesDone.length} of ${L.phrases.length}</b></div>
         <div class="stat"><span>Sets finished</span><b>${p.runs.length}</b></div>
+        <div class="stat"><span>Conversation questions answered</span><b>${(p.talked||[]).length} of ${TALK.length}</b></div>
         <div class="stat"><span>Mini project</span><b>${text ? "Written" : "Not yet"}</b></div>
         <p class="small muted">Doing activities is practice. It isn’t the same as knowing it on your own.</p>
       </div>
@@ -755,6 +1011,7 @@ function viewProgress(){
       <div class="stat"><span>At the end</span><b>${p.confEnd ?? "—"}</b></div>
       <p class="small muted">Your own feeling, kept apart from your answers.</p>
     </div>
+    ${p.sounds && Object.keys(p.sounds).length ? `<div class="card stack-sm"><h3>Sound lab · ear tests</h3>${Object.entries(p.sounds).map(([k,r])=>`<div class="stat"><span>${esc((SOUNDS.find(x=>x.id===k)||{}).title||k)}</span><b>${r.right} of ${r.total}</b></div>`).join("")}<p class="small muted">Right answers when telling two similar words apart by ear.</p></div>` : ""}
     ${p.wordsHard.length ? `<div class="card stack-sm"><h3>Still learning</h3><p lang="es">${p.wordsHard.map(esc).join(" · ")}</p></div>` : ""}
     ${text ? `<div class="card stack-sm"><h3>My profile</h3><p lang="es" class="es-md" style="font-size:20px">${esc(text)}</p><div class="row"><a class="btn" href="#project" data-nav="project">Edit my profile</a></div></div>` : ""}
     <div class="card stack-sm"><h3>History</h3>
@@ -784,7 +1041,8 @@ function summaryText(){
     `Final check (no help): ${sc("check")}`,
     `Last practice (no help): ${sc("practice")}`,
     `Confidence start/end: ${p.confStart ?? "-"} / ${p.confEnd ?? "-"}`,
-    `My profile: ${projectText() || "-"}`].join("\n");
+    `My profile: ${projectText() || "-"}`,
+    `Sound lab ear tests: ${p.sounds ? Object.entries(p.sounds).map(([k,r])=>`${k} ${r.right}/${r.total}`).join(", ") || "-" : "-"}`].join("\n");
 }
 
 /* ============ RENDER + ROUTER ============ */
@@ -847,6 +1105,26 @@ document.addEventListener("click", e=>{
     case "checkstart": ui.checkStarted = true; ui.run = newRun("check","lesson"); render(); break;
     case "phnext": { const k = ui.ph; if(!p.phrasesDone.includes(k)){ p.phrasesDone.push(k); save(); } stopMedia(); ui.ph++; render(); window.scrollTo(0,0); break; }
     case "rec": Rec.start(el.dataset.k); break;
+    case "echo": Rec.stop(); Check.stop(); Voice.echo(el.dataset.t, el.dataset.k); setEcho(ui.echo); break;
+    case "chk": Check.start(el.dataset.k, el.dataset.t); break;
+    case "chkstop": Check.stop(); break;
+    case "lstab": stopMedia(); ui.lsTab = el.dataset.k; ui.sound = null; ui.quiz = null; ui.open = null; render(); break;
+    case "sopen": stopMedia(); ui.sound = el.dataset.k; ui.quiz = null; render(); window.scrollTo(0,0); break;
+    case "sclose": stopMedia(); ui.sound = null; ui.quiz = null; render(); break;
+    case "qplay": {
+      const sd = SOUNDS.find(x=>x.id===ui.sound); const q = ui.quiz || {right:0,total:0};
+      if(q.target && !q.picked){ Voice.speak(q.target, 0.85); break; }
+      q.pair = Math.floor(Math.random()*sd.pairs.length); q.target = sd.pairs[q.pair][Math.random()<.5?0:2]; q.picked = null;
+      ui.quiz = q; render(); Voice.speak(q.target, 0.85); break; }
+    case "qpick": {
+      const q = ui.quiz; if(!q || q.picked) break; q.picked = el.dataset.v; q.total++; if(q.picked===q.target) q.right++;
+      p.sounds = p.sounds || {}; const r = p.sounds[ui.sound] = p.sounds[ui.sound] || {right:0,total:0}; r.total++; if(q.picked===q.target) r.right++;
+      save(); render(); break; }
+    case "tmean": ui.talk.phase = Math.max(ui.talk.phase, 1); render(); break;
+    case "thelp": ui.talk.help = !ui.talk.help; render(); break;
+    case "tmodel": ui.talk.phase = 2; p.talked = p.talked || []; if(!p.talked.includes(ui.talk.i)){ p.talked.push(ui.talk.i); save(); } render(); break;
+    case "tnext": stopMedia(); ui.talk = {i: ui.talk.i+1<TALK.length ? ui.talk.i+1 : 0, phase:0}; render(); window.scrollTo(0,0); break;
+    case "tprev": stopMedia(); ui.talk = {i: Math.max(0, ui.talk.i-1), phase:0}; render(); window.scrollTo(0,0); break;
     case "recstop": Rec.stop(); break;
     case "recplay": Rec.play(el.dataset.k); break;
     case "pchip": { p.project.fields[el.dataset.f] = el.dataset.v; save(); render(); break; }
@@ -923,6 +1201,7 @@ window.addEventListener("pagehide", ()=>Rec.clearAll());
 
 /* ============ START ============ */
 Voice.init();
+Check.init();
 (function start(){
   const v = location.hash.slice(1);
   if(v && VIEWS[v]) ui.view = v;
