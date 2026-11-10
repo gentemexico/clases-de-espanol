@@ -88,6 +88,7 @@ p{margin:0}
 .opt.right{border-color:var(--good);background:var(--good-soft)}
 .opt.wrong{border-color:var(--warn);background:var(--warn-soft)}
 .opt[disabled]{cursor:default}
+.opt.chosen{border-color:var(--primary);background:var(--primary-soft)}
 .sentence{font-family:var(--f-display);font-size:clamp(24px,6vw,30px);font-weight:700}
 .blank{display:inline-block;min-width:3.2em;border-bottom:3px solid var(--accent);text-align:center;color:var(--accent)}
 .pron{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;align-items:center}
@@ -251,6 +252,55 @@ const WHO = {
   "mi amiga":{en:"my friend (she)", end:"-a", why:"Mi amiga is one person, like ella (she). The verb ends in -a."},
   "mi hermana":{en:"my sister (she)", end:"-a", why:"Mi hermana is like ella (she). The verb ends in -a."}
 };
+/* Placement test: 3 stages that get harder. audio:true = listen only, the Spanish is hidden until the end. */
+const PT = [
+  // Stage 1 · basics
+  {id:"a1", st:1, sk:"Vocabulary", topic:"Greetings", ask:"What does this mean?", es:"hola", ok:"Hello", o:["Goodbye","Thank you"]},
+  {id:"a2", st:1, sk:"Listening", topic:"Greetings", ask:"Listen. What did you hear?", es:"Buenos días.", audio:true, ok:"Good morning", o:["Good night","See you later"]},
+  {id:"a3", st:1, sk:"Listening", topic:"Numbers", ask:"Listen. Which number is it?", es:"quince", audio:true, ok:"15", o:["50","5"]},
+  {id:"a4", st:1, sk:"Vocabulary", topic:"Colors", ask:"What does this mean?", es:"rojo", ok:"red", o:["blue","green"]},
+  {id:"a5", st:1, sk:"Vocabulary", topic:"Family", ask:"What does this mean?", es:"la madre", ok:"the mother", o:["the father","the sister"]},
+  {id:"a6", st:1, sk:"Vocabulary", topic:"Days of the week", ask:"What does this mean?", es:"el lunes", ok:"Monday", o:["Friday","Sunday"]},
+  {id:"a7", st:1, sk:"Grammar", topic:"el / la (masculine and feminine)", ask:"Which word completes it?", es:"___ casa", ok:"la", o:["el","los"]},
+  {id:"a8", st:1, sk:"Grammar", topic:"Plurals", ask:"How do you say “two books”?", es:"", ok:"dos libros", o:["dos libro","un libros"]},
+  {id:"a9", st:1, sk:"Listening", topic:"Basic questions", ask:"Listen. What is the question?", es:"¿Cómo te llamas?", audio:true, ok:"What’s your name?", o:["How are you?","Where are you from?"]},
+  {id:"a10", st:1, sk:"Vocabulary", topic:"Courtesy words", ask:"What does this mean?", es:"gracias", ok:"thank you", o:["please","sorry"]},
+  // Stage 2 · beginner
+  {id:"b1", st:2, sk:"Grammar", topic:"Present tense (-ir verbs, nosotros)", ask:"Which word completes it?", es:"Nosotros ___ en Las Vegas.", en:"We live in Las Vegas.", ok:"vivimos", o:["vivo","viven"]},
+  {id:"b2", st:2, sk:"Grammar", topic:"estar (feelings, states)", ask:"Which word completes it?", es:"Yo ___ cansado.", en:"I am tired.", ok:"estoy", o:["soy","es"]},
+  {id:"b3", st:2, sk:"Grammar", topic:"ser (origin)", ask:"Which word completes it?", es:"Ella ___ de México.", en:"She is from Mexico.", ok:"es", o:["está","son"]},
+  {id:"b4", st:2, sk:"Grammar", topic:"tener (age)", ask:"Which word completes it?", es:"Yo ___ diecisiete años.", en:"I am seventeen years old.", ok:"tengo", o:["soy","estoy"]},
+  {id:"b5", st:2, sk:"Grammar", topic:"gustar", ask:"Which word completes it?", es:"Me ___ los perros.", en:"I like dogs.", ok:"gustan", o:["gusta","gusto"]},
+  {id:"b6", st:2, sk:"Vocabulary", topic:"Question words", ask:"Which word completes it?", es:"¿___ vives?", en:"Where do you live?", ok:"Dónde", o:["Cuándo","Quién"]},
+  {id:"b7", st:2, sk:"Listening", topic:"Near future (ir a)", ask:"Listen. What does it mean?", es:"Mañana voy a la playa.", audio:true, ok:"Tomorrow I’m going to the beach.", o:["Yesterday I went to the beach.","Today I’m at the beach."]},
+  {id:"b8", st:2, sk:"Reading", topic:"Reading short texts", ask:"Read. How old is Diego?", es:"Mi hermano se llama Diego. Tiene veinte años y trabaja en un restaurante.", ok:"20", o:["12","2"]},
+  {id:"b9", st:2, sk:"Grammar", topic:"Present tense (-er verbs, ellos)", ask:"Which word completes it?", es:"Ellos ___ pizza.", en:"They eat pizza.", ok:"comen", o:["comes","como"]},
+  {id:"b10", st:2, sk:"Vocabulary", topic:"False friends", ask:"What does this mean?", es:"la biblioteca", ok:"the library", o:["the bookstore","the bedroom"]},
+  // Stage 3 · high beginner
+  {id:"c1", st:3, sk:"Grammar", topic:"Past tense (ir)", ask:"Which word completes it?", es:"Ayer yo ___ al cine.", en:"Yesterday I went to the movies.", ok:"fui", o:["voy","iré"]},
+  {id:"c2", st:3, sk:"Grammar", topic:"Past tense (-ar verbs)", ask:"Which word completes it?", es:"Ayer ella ___ con su amiga.", en:"Yesterday she talked with her friend.", ok:"habló", o:["habla","hablará"]},
+  {id:"c3", st:3, sk:"Grammar", topic:"ir a + verb", ask:"Which word completes it?", es:"Voy a ___ mañana.", en:"I’m going to study tomorrow.", ok:"estudiar", o:["estudio","estudié"]},
+  {id:"c4", st:3, sk:"Grammar", topic:"Reflexive verbs", ask:"Which words complete it?", es:"Yo ___ a las siete.", en:"I get up at seven.", ok:"me levanto", o:["levanto","se levanta"]},
+  {id:"c5", st:3, sk:"Grammar", topic:"Comparisons", ask:"Which word completes it?", es:"Mi casa es ___ grande que tu casa.", en:"My house is bigger than your house.", ok:"más", o:["muy","tan"]},
+  {id:"c6", st:3, sk:"Grammar", topic:"Stem-changing verbs (poder)", ask:"Which word completes it?", es:"Yo no ___ ir.", en:"I can’t go.", ok:"puedo", o:["podo","puede"]},
+  {id:"c7", st:3, sk:"Listening", topic:"Past tense in speech", ask:"Listen. What does it mean?", es:"El fin de semana pasado jugué fútbol con mis primos.", audio:true, ok:"Last weekend I played soccer with my cousins.", o:["Next weekend I will play soccer with my cousins.","Every weekend I play soccer with my cousins."]},
+  {id:"c8", st:3, sk:"Reading", topic:"Reading about past and present", ask:"Read. Where does he live now?", es:"Cuando era niño, vivía en Texas. Ahora vivo en Nevada y estudio en una escuela privada.", ok:"Nevada", o:["Texas","California"]}
+];
+const PT_PASS = {1:7, 2:6};
+const PT_SPEAK = [
+  {id:"s1", ask:"Say hello and your name.", model:"Hola, me llamo Alex."},
+  {id:"s2", ask:"Say how old you are.", model:"Tengo diecisiete años."},
+  {id:"s3", ask:"Say something you like.", model:"Me gusta la música."},
+  {id:"s4", ask:"Say what you did last weekend.", model:"El fin de semana pasado jugué básquetbol."}
+];
+const PT_BANDS = [
+  {id:"zero", name:"Starting from zero", plan:"Start with sounds, greetings, numbers and everyday words. Then the present tense of -ar verbs (Lesson 1)."},
+  {id:"early", name:"Early beginner", plan:"Firm up basic words (numbers, family, days) and el/la. Then the present tense of -ar verbs (Lesson 1)."},
+  {id:"beg", name:"Beginner", plan:"Knows the basics. Work on the present tense, ser vs. estar, tener and gustar, and question words."},
+  {id:"high", name:"High beginner", plan:"Comfortable with the present. Work on the past tense, ir a + verb, reflexive verbs and comparisons."},
+  {id:"inter", name:"Ready for intermediate work", plan:"Strong at this level. The tutor should check school material and use a harder test."}
+];
+
 /* Sound lab: the sounds English speakers usually find hard. pairs = [word A, meaning A, word B, meaning B] */
 const SOUNDS = [
   {id:"vowels", big:"a e i o u", title:"Five pure vowels", short:"Short and steady. No glide.",
@@ -628,7 +678,11 @@ function viewHome(){
     <p class="muted" style="font-size:19px;max-width:36ch">Listen, try it, and see your progress. It’s okay to make mistakes.</p>
     <div class="row"><button class="btn primary big" data-a="startlesson">${started && !p.finishedAt ? "Continue lesson 1" : p.finishedAt ? "Do lesson 1 again" : "Start lesson 1"} →</button></div>
   </section>
-  <section class="card stack" style="margin-top:20px">
+  <section class="card item" style="margin-top:20px">
+    <div class="stack-sm"><h3>Placement test</h3><p class="small muted">10–15 minutes, with your tutor. Shows where to start. Not a grade.</p>${DB.placement ? `<span class="badge good">Done: ${esc(DB.placement.band)}</span>` : `<span class="badge">Not taken yet</span>`}</div>
+    <a class="btn" href="#placement" data-nav="placement">${DB.placement ? "See result" : "Take the test"}</a>
+  </section>
+  <section class="card stack" style="margin-top:14px">
     <h3>What you’ll do</h3>
     <ol class="stack-sm" style="margin:0;padding-left:22px">${STEP_NAMES.map((s,i)=>`<li>${s}${i<p.step||p.finishedAt?' <span class="badge good">Done</span>':''}</li>`).join("")}</ol>
     <p class="small muted">About 20 minutes. You can stop anytime and come back. Your place is saved on this device.</p>
@@ -898,6 +952,108 @@ function viewNotes(){
       <div class="row"><a class="btn" href="#practice" data-nav="practice">Go to Practice</a></div></section>
   </div>`;
 }
+function ptItems(t){ return PT.filter(x=>t.stages.includes(x.st)); }
+function ptScore(t, st){ const xs = PT.filter(x=>x.st===st); return {c:xs.filter(x=>t.answers[x.id]===x.ok).length, n:xs.length}; }
+function ptBand(t){
+  const s1 = ptScore(t,1).c, s2 = t.stages.includes(2) ? ptScore(t,2).c : -1, s3 = t.stages.includes(3) ? ptScore(t,3).c : -1;
+  if(s1<4) return PT_BANDS[0];
+  if(s1<PT_PASS[1]) return PT_BANDS[1];
+  if(s2<PT_PASS[2]) return PT_BANDS[2];
+  if(s3<5) return PT_BANDS[3];
+  return PT_BANDS[4];
+}
+function viewPlacement(){
+  const t = ui.pt, last = DB.placement;
+  if(!t){
+    return `<div class="stack">
+      <span class="eyebrow">Placement test</span>
+      <h2>Let’s see where you’re starting</h2>
+      <p class="muted" style="font-size:18px">This helps your tutor plan your classes. It isn’t a grade.</p>
+      <div class="card stack-sm">
+        <div class="stat"><span>Time</span><b>10–15 minutes</b></div>
+        <div class="stat"><span>Parts</span><b>Up to 3, each a bit harder</b></div>
+        <div class="stat"><span>You need</span><b>Sound on</b></div>
+      </div>
+      <div class="card stack-sm"><h3>How it works</h3>
+        <ul class="cando">
+          <li>Read or listen, then choose an answer.</li>
+          <li><strong>If you don’t know, tap “I don’t know”.</strong> Guessing makes the result less useful.</li>
+          <li>You won’t see right or wrong until the end.</li>
+          <li>If a part is too hard, the test stops early. That’s normal and useful.</li>
+          <li>At the end there’s a short speaking part with your tutor.</li>
+        </ul></div>
+      ${last ? `<p class="note">You took this test on ${new Date(last.at).toLocaleDateString([], {month:"short", day:"numeric"})}. Result: <strong>${esc(last.band)}</strong>. <a href="#placement" data-a="ptshow">See the result</a></p>` : ""}
+      <div class="row"><button class="btn primary big" data-a="ptstart">${last ? "Take the test again" : "Start the test"} →</button></div>
+    </div>`;
+  }
+  if(t.done) return ptResult(t);
+  if(t.speak) return ptSpeak(t);
+  const items = ptItems(t), x = items[t.i], stageItems = items.filter(y=>y.st===x.st), k = stageItems.indexOf(x);
+  const a = t.answers[x.id];
+  return `<div class="stack">
+    <div class="stepbar"><span class="eyebrow">Part ${x.st} of 3 · Question ${k+1} of ${stageItems.length}</span>
+      <div class="steps" style="grid-template-columns:repeat(${stageItems.length},1fr)" aria-hidden="true">${stageItems.map((_,j)=>`<i class="${j<k?"done":j===k?"now":""}"></i>`).join("")}</div></div>
+    <div class="card stack">
+      <h3>${esc(x.ask)}</h3>
+      ${x.audio ? `<div class="row"><button class="btn primary" data-a="ptplay">🔊 Play</button><button class="btn" data-a="ptplay" data-r="0.7">Play slowly</button><span class="small muted">Listen as many times as you need.</span></div>`
+        : x.es ? `<p class="${x.es.length>40?"es-md":"sentence"}" lang="es" style="${x.es.length>40?"font-size:21px;line-height:1.45":""}">${blankify(x.es)}</p>` : ""}
+      ${x.en ? `<p class="muted">Meaning: ${esc(x.en)}</p>` : ""}
+      <div class="opts">${t.orders[x.id].map(o=>`<button class="opt ${a===o?"chosen":""}" style="font-size:18px" data-a="ptans" data-o="${esc(o)}" aria-pressed="${a===o}" ${a?"disabled":""}>${esc(o)}</button>`).join("")}
+        <button class="opt" style="font-size:17px;color:var(--muted)" data-a="ptans" data-o="__idk" ${a?"disabled":""}>I don’t know</button></div>
+    </div>
+    <div class="row" style="justify-content:space-between"><button class="btn ghost" data-a="ptquit">Stop the test</button><span class="small muted">Your answer is saved when you tap it.</span></div>
+    ${ui.ptQuitAsk ? `<div class="card stack-sm"><p>Stop now? Your answers so far will be lost.</p><div class="row"><button class="btn" data-a="ptquityes">Yes, stop</button><button class="btn primary" data-a="ptquitno">Keep going</button></div></div>` : ""}
+  </div>`;
+}
+function ptSpeak(t){
+  return `<div class="stack">
+    <span class="eyebrow">Last part · Speaking with your tutor</span>
+    <h2>Say it out loud</h2>
+    <p class="muted">Try each one out loud. Your tutor will mark it. If there’s no tutor with you right now, you can skip this part.</p>
+    ${PT_SPEAK.map(sp=>{const v = t.speakMarks[sp.id];
+      return `<div class="card stack-sm"><h3>${esc(sp.ask)}</h3>
+        <details><summary>Example answer</summary><div class="row" style="margin-top:6px"><span lang="es" class="es-md" style="font-size:20px">${esc(sp.model)}</span><button class="btn ghost" data-a="say" data-t="${esc(sp.model)}">🔊</button></div></details>
+        <span class="label">For your tutor</span>
+        <div class="conf" role="group" aria-label="Tutor mark">${[["yes","Said it"],["help","With help"],["no","Not yet"]].map(([k,n])=>`<button class="chip ${v===k?"on":""}" data-a="ptmark" data-k="${sp.id}" data-v="${k}" aria-pressed="${v===k}">${n}</button>`).join("")}</div></div>`;}).join("")}
+    <div class="row"><button class="btn primary big" data-a="ptfinish">See my result →</button><button class="btn ghost" data-a="ptfinish" data-skip="1">Skip speaking</button></div>
+  </div>`;
+}
+function ptResult(t){
+  const band = PT_BANDS.find(b=>b.id===t.bandId);
+  const items = ptItems(t);
+  const skills = ["Listening","Vocabulary","Grammar","Reading"].map(sk=>{const xs = items.filter(x=>x.sk===sk); return {sk, c:xs.filter(x=>t.answers[x.id]===x.ok).length, n:xs.length};}).filter(x=>x.n);
+  const missTopics = [...new Set(items.filter(x=>t.answers[x.id]!==x.ok).map(x=>x.topic))];
+  const knownTopics = [...new Set(items.filter(x=>t.answers[x.id]===x.ok).map(x=>x.topic))].filter(tp=>!missTopics.includes(tp));
+  const idk = items.filter(x=>t.answers[x.id]==="__idk").length;
+  const sp = Object.keys(t.speakMarks).length;
+  return `<div class="stack">
+    <span class="eyebrow">Placement result</span>
+    <p class="celebrate">Test done. Thanks for being honest.</p>
+    <div class="card stack-sm"><span class="label">Starting point</span><h2>${esc(band.name)}</h2><p>${esc(band.plan)}</p>
+      <p class="small muted">A starting point for planning classes. It isn’t a grade or an official level.</p></div>
+    <div class="card stack-sm"><h3>By skill</h3>
+      ${skills.map(x=>`<div class="stat"><span>${x.sk}</span><b>${x.c} of ${x.n}</b></div>`).join("")}
+      ${[1,2,3].filter(st=>t.stages.includes(st)).map(st=>{const sc = ptScore(t,st); return `<div class="stat"><span class="muted">Part ${st}</span><b class="muted">${sc.c} of ${sc.n}</b></div>`;}).join("")}
+      ${idk ? `<p class="small muted">You tapped “I don’t know” ${idk} ${idk===1?"time":"times"}. That helps us plan.</p>` : ""}
+      ${t.stages.length<3 ? `<p class="small muted">The test stopped after part ${t.stages.length} because the next part would have been too hard for now.</p>` : ""}</div>
+    ${knownTopics.length ? `<div class="card stack-sm"><h3>You already know</h3><p>${knownTopics.map(esc).join(" · ")}</p></div>` : ""}
+    ${missTopics.length ? `<div class="card stack-sm"><h3>To work on</h3><p>${missTopics.map(esc).join(" · ")}</p></div>` : ""}
+    ${sp ? `<div class="card stack-sm"><h3>Speaking (marked by your tutor)</h3>${PT_SPEAK.filter(x=>t.speakMarks[x.id]).map(x=>`<div class="stat"><span>${esc(x.ask)}</span><b>${({yes:"Said it",help:"With help",no:"Not yet"})[t.speakMarks[x.id]]}</b></div>`).join("")}</div>` : ""}
+    <details class="card"><summary>Review answers</summary><div class="stack-sm" style="margin-top:8px">${items.map(x=>{const a = t.answers[x.id];
+      return `<div class="stat"><span><span lang="es">${esc(x.es || x.ask)}</span><br><span class="small muted">${esc(x.topic)}</span></span><b style="font-size:15px;text-align:right">${a===x.ok?'<span class="badge good">Right</span>':a==="__idk"?'<span class="badge">Didn’t know</span>':'<span class="badge">Not yet</span>'}<br><span class="small muted" style="font-family:var(--f-body)">${esc(x.ok)}</span></b></div>`;}).join("")}</div></details>
+    <div class="row"><button class="btn primary" data-a="ptcopy">Copy result for my tutor</button><button class="btn" data-a="startlesson">Go to lesson 1</button></div>
+    <textarea id="ptbox" readonly hidden aria-label="Placement result"></textarea>
+  </div>`;
+}
+function ptSummary(){
+  const r = DB.placement; if(!r) return "Placement test: not taken";
+  return [`Placement test (${new Date(r.at).toLocaleDateString()}): ${r.band}`,
+    `Parts: ${r.parts.map(x=>`Part ${x.st} ${x.c}/${x.n}`).join(", ")}`,
+    `By skill: ${r.skills.map(x=>`${x.sk} ${x.c}/${x.n}`).join(", ")}`,
+    `"I don't know": ${r.idk}`,
+    `To work on: ${r.miss.join("; ") || "-"}`,
+    `Speaking: ${Object.entries(r.speak).map(([k,v])=>`${k}=${v}`).join(", ") || "skipped"}`].join("\n");
+}
 function viewLessons(){
   return `<div class="stack"><h2>My lessons</h2>
     ${LESSONS.map(L=>{const p=prog(L.id); return `<div class="card item">
@@ -1093,6 +1249,7 @@ function viewProgress(){
         <p class="small muted">Counts answers right on the first try without hints.</p>
       </div>
     </div>
+    ${DB.placement ? `<div class="card stack-sm"><h3>Placement test</h3><div class="stat"><span>Starting point</span><b>${esc(DB.placement.band)}</b></div>${DB.placement.skills.map(x=>`<div class="stat"><span>${x.sk}</span><b>${x.c} of ${x.n}</b></div>`).join("")}<div class="row"><a class="btn" href="#placement" data-nav="placement">See full result</a></div></div>` : ""}
     <div class="card stack-sm"><h3>How sure you felt</h3>
       <div class="stat"><span>At the start</span><b>${p.confStart ?? "—"}</b></div>
       <div class="stat"><span>At the end</span><b>${p.confEnd ?? "—"}</b></div>
@@ -1120,7 +1277,7 @@ function viewProgress(){
 }
 function summaryText(){
   const L = lesson(), p = prog(), sc = k=>{const r=lastRun(k); return r?`${scoreOf(r).c}/${scoreOf(r).n}`:"not done";};
-  return [`Clases de Español — Lesson 1 (${L.title})`,
+  return [`Clases de Español — Lesson 1 (${L.title})`, ptSummary(),
     `Words practiced: ${p.wordsSeen.length}/${L.words.length}`,
     `Still learning: ${p.wordsHard.join(", ") || "none"}`,
     `Sentences said aloud: ${p.phrasesDone.length}/${L.phrases.length}`,
@@ -1134,8 +1291,8 @@ function summaryText(){
 }
 
 /* ============ RENDER + ROUTER ============ */
-const VIEWS = {home:viewHome, lesson:viewLesson, lessons:viewLessons, words:viewWords, practice:viewPractice, listen:viewListen, progress:viewProgress, notes:viewNotes, project:()=>`<div class="stack">${stepProject(true)}</div>`};
-const NAV_OF = {lesson:"home", project:"progress", notes:"lessons"};
+const VIEWS = {home:viewHome, lesson:viewLesson, lessons:viewLessons, words:viewWords, practice:viewPractice, listen:viewListen, progress:viewProgress, notes:viewNotes, placement:viewPlacement, project:()=>`<div class="stack">${stepProject(true)}</div>`};
+const NAV_OF = {lesson:"home", project:"progress", notes:"lessons", placement:"home"};
 function render(keepFocus){
   const main = $("#main");
   const active = document.activeElement;
@@ -1149,6 +1306,8 @@ function go(view, noHash){
   ui.help = false; ui.open = null; ui.confirmReset = false; ui.quitNote = false;
   if(ui.run && ui.run.where==="tab" && view!=="practice") ui.run = null;
   if(view!=="practice") ui.comp = null;
+  ui.ptQuitAsk = false;
+  if(ui.pt && ui.pt.done) ui.pt = null;
   ui.view = VIEWS[view] ? view : "home";
   if(!noHash){ try{ history.replaceState(null, "", "#"+ui.view); }catch(e){ location.hash = ui.view; } }
   render();
@@ -1197,6 +1356,39 @@ document.addEventListener("click", e=>{
     case "echo": Rec.stop(); Check.stop(); Voice.echo(el.dataset.t, el.dataset.k); setEcho(ui.echo); break;
     case "chk": Check.start(el.dataset.k, el.dataset.t); break;
     case "chkstop": Check.stop(); break;
+    case "ptstart": { ui.pt = {i:0, stages:[1], answers:{}, orders:Object.fromEntries(PT.map(x=>[x.id, shuffle([x.ok].concat(x.o))])), speak:false, speakMarks:{}, done:false}; render(); window.scrollTo(0,0); break; }
+    case "ptplay": { const t = ui.pt, x = ptItems(t)[t.i]; t.plays = (t.plays||0)+1; Voice.speak(x.es, el.dataset.r ? +el.dataset.r : 0.95); break; }
+    case "ptans": {
+      const t = ui.pt, items = ptItems(t), x = items[t.i]; if(t.answers[x.id]) break;
+      t.answers[x.id] = el.dataset.o; stopMedia();
+      const lastOfStage = !items[t.i+1] || items[t.i+1].st!==x.st;
+      if(lastOfStage){
+        const st = x.st, sc = ptScore(t, st);
+        if(st<3 && sc.c>=PT_PASS[st]){ t.stages.push(st+1); t.i++; }
+        else t.speak = true;
+      } else t.i++;
+      render(); window.scrollTo(0,0); break; }
+    case "ptmark": ui.pt.speakMarks[el.dataset.k] = el.dataset.v; render(); break;
+    case "ptfinish": {
+      const t = ui.pt; if(el.dataset.skip) t.speakMarks = {};
+      const band = ptBand(t); t.bandId = band.id; t.done = true;
+      const items = ptItems(t);
+      DB.placement = {at:Date.now(), band:band.name, bandId:band.id, answers:t.answers, stages:t.stages,
+        parts:t.stages.map(st=>Object.assign({st}, ptScore(t,st))),
+        skills:["Listening","Vocabulary","Grammar","Reading"].map(sk=>{const xs = items.filter(x=>x.sk===sk); return {sk, c:xs.filter(x=>t.answers[x.id]===x.ok).length, n:xs.length};}).filter(x=>x.n),
+        miss:[...new Set(items.filter(x=>t.answers[x.id]!==x.ok).map(x=>x.topic))], idk:items.filter(x=>t.answers[x.id]==="__idk").length,
+        speak:Object.fromEntries(Object.entries(t.speakMarks).map(([k,v])=>[PT_SPEAK.find(x=>x.id===k).ask, ({yes:"said it",help:"with help",no:"not yet"})[v]]))};
+      save(); render(); window.scrollTo(0,0); break; }
+    case "ptshow": { e.preventDefault(); const r = DB.placement; ui.pt = {done:true, bandId:r.bandId, answers:r.answers, stages:r.stages, speakMarks:{}}; 
+      const m = {"said it":"yes","with help":"help","not yet":"no"}; PT_SPEAK.forEach(sp=>{ if(r.speak[sp.ask]) ui.pt.speakMarks[sp.id] = m[r.speak[sp.ask]]; }); render(); break; }
+    case "ptquit": ui.ptQuitAsk = true; render(); break;
+    case "ptquitno": ui.ptQuitAsk = false; render(); break;
+    case "ptquityes": stopMedia(); ui.pt = null; ui.ptQuitAsk = false; render(); break;
+    case "ptcopy": {
+      const t = ptSummary(), box = $("#ptbox");
+      const fallback = ()=>{ box.hidden = false; box.value = t; box.focus(); box.select(); toast("Select the text below and copy it."); };
+      try{ navigator.clipboard.writeText(t).then(()=>toast("Copied. Paste it in a message to your tutor."), fallback); }catch(err){ fallback(); }
+      break; }
     case "gosounds": go("listen"); ui.lsTab = "sounds"; render(); break;
     case "compstart": { const d = el.dataset.k==="read" ? L.reading : L.listening;
       ui.comp = {kind:el.dataset.k, answers:{}, plays:0, showT:false, orders:d.qs.map(q=>shuffle([q.ok].concat(q.others)))}; render(); window.scrollTo(0,0); break; }
