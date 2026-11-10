@@ -1,0 +1,932 @@
+<title>Clases de Español</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: one calm column, a sticky header with the student menu, one main action per screen. */
+:root{
+  --bg:#F2F5F6; --surface:#FFFFFF; --sunk:#E6ECEE; --line:#CFD9DC;
+  --ink:#13232B; --muted:#4F626B;
+  --primary:#0C6A66; --primary-ink:#FFFFFF; --primary-soft:#D5EDEA;
+  --accent:#B86E00; --accent-soft:#FBEBD0;
+  --good:#1B7A3E; --good-soft:#DCF1E3; --warn:#9A3B12; --warn-soft:#F9E2D7;
+  --focus:#1A5FD1;
+  --f-display:"Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --f-body:"Figtree", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --f-mono:"JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --r:14px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0E171C; --surface:#152229; --sunk:#1C2C34; --line:#2C3F48;
+  --ink:#E6EEF1; --muted:#9DB0B8;
+  --primary:#3FBFB4; --primary-ink:#06201E; --primary-soft:#173B3A;
+  --accent:#F0B44C; --accent-soft:#3A2C12;
+  --good:#5BD08A; --good-soft:#163524; --warn:#F39A73; --warn-soft:#3A2018;
+  --focus:#7FB0FF; color-scheme:dark;}}
+:root[data-theme="dark"]{
+  --bg:#0E171C; --surface:#152229; --sunk:#1C2C34; --line:#2C3F48;
+  --ink:#E6EEF1; --muted:#9DB0B8;
+  --primary:#3FBFB4; --primary-ink:#06201E; --primary-soft:#173B3A;
+  --accent:#F0B44C; --accent-soft:#3A2C12;
+  --good:#5BD08A; --good-soft:#163524; --warn:#F39A73; --warn-soft:#3A2018;
+  --focus:#7FB0FF; color-scheme:dark;}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:17px;line-height:1.5}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--surface)}
+.wrap{max-width:760px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--surface);border-bottom:1px solid var(--line)}
+.brandrow{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:10px 4px}
+.brand{font-family:var(--f-display);font-weight:800;font-size:20px;letter-spacing:-.01em;color:var(--ink);text-decoration:none}
+.brand span{color:var(--primary)}
+.nav{display:flex;gap:6px;overflow-x:auto;padding-block:6px 10px;scrollbar-width:none}
+.nav::-webkit-scrollbar{display:none}
+.nav a{flex:none;text-decoration:none;color:var(--muted);font-weight:600;font-size:15px;padding:8px 12px;border-radius:999px;border:1px solid transparent;min-height:40px;display:inline-flex;align-items:center}
+.nav a[aria-current="page"]{color:var(--primary);background:var(--primary-soft)}
+main{padding-block:20px 64px}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;line-height:1.15;letter-spacing:-.01em}
+h1{font-size:clamp(30px,7vw,46px);font-weight:800}
+h2{font-size:26px;font-weight:800}
+h3{font-size:19px;font-weight:600}
+p{margin:0}
+.stack{display:flex;flex-direction:column;gap:16px}
+.stack-sm{display:flex;flex-direction:column;gap:8px}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.muted{color:var(--muted)}
+.small{font-size:15px}
+.eyebrow{font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:20px;min-width:0}
+.hero{padding-block:24px 8px}
+.btn{font:inherit;font-weight:700;font-size:16px;min-height:48px;padding:10px 18px;border-radius:12px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;display:inline-flex;align-items:center;gap:8px;text-decoration:none}
+.btn:hover{border-color:var(--primary)}
+.btn.primary{background:var(--primary);border-color:var(--primary);color:var(--primary-ink)}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn.ghost{border-color:transparent;background:transparent;color:var(--primary);padding-inline:10px}
+.btn.big{font-size:18px;min-height:56px;padding-inline:26px}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.btn .ico{font-size:18px;line-height:1}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.stepbar{display:flex;flex-direction:column;gap:8px}
+.steps{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.steps i{height:6px;border-radius:3px;background:var(--sunk)}
+.steps i.done{background:var(--primary)}
+.steps i.now{background:var(--accent)}
+.es{font-family:var(--f-display);font-weight:800;font-size:clamp(34px,9vw,52px);letter-spacing:-.015em;line-height:1.05}
+.es-md{font-family:var(--f-display);font-weight:700;font-size:clamp(24px,6vw,32px);line-height:1.2}
+.icon-big{font-size:44px;line-height:1}
+.guide{font-family:var(--f-mono);font-size:16px;background:var(--sunk);border-radius:8px;padding:6px 10px;display:inline-block;overflow-wrap:anywhere}
+.guide b{color:var(--accent);font-weight:500;text-decoration:underline;text-underline-offset:3px}
+.label{font-size:13px;font-weight:700;color:var(--muted);letter-spacing:.04em;text-transform:uppercase}
+.tip{background:var(--accent-soft);border-radius:10px;padding:10px 14px;font-size:15.5px}
+.note{background:var(--sunk);border-radius:10px;padding:10px 14px;font-size:15px;color:var(--muted)}
+.fb{border-radius:12px;padding:14px 16px;font-weight:500}
+.fb.ok{background:var(--good-soft);color:var(--ink);border-left:5px solid var(--good)}
+.fb.no{background:var(--warn-soft);color:var(--ink);border-left:5px solid var(--warn)}
+.fb strong{display:block;font-family:var(--f-display);font-size:19px;margin-bottom:2px}
+.opts{display:grid;gap:10px}
+.opt{font:inherit;font-size:20px;font-weight:600;text-align:left;min-height:56px;padding:12px 16px;border-radius:12px;border:2px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.opt:hover:not([disabled]){border-color:var(--primary)}
+.opt.right{border-color:var(--good);background:var(--good-soft)}
+.opt.wrong{border-color:var(--warn);background:var(--warn-soft)}
+.opt[disabled]{cursor:default}
+.sentence{font-family:var(--f-display);font-size:clamp(24px,6vw,30px);font-weight:700}
+.blank{display:inline-block;min-width:3.2em;border-bottom:3px solid var(--accent);text-align:center;color:var(--accent)}
+.pron{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;align-items:center}
+.pron .es-md{font-size:22px}
+.chip{font:inherit;font-size:15px;font-weight:600;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:6px 12px;min-height:40px;cursor:pointer}
+.chip.on{background:var(--primary-soft);border-color:var(--primary);color:var(--primary)}
+.model{display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-family:var(--f-display);font-size:22px;font-weight:700}
+.model .pill{background:var(--primary-soft);color:var(--primary);border-radius:10px;padding:4px 10px}
+.model .end{color:var(--accent)}
+table.who{border-collapse:collapse;width:100%}
+table.who td{padding:10px 8px;border-bottom:1px solid var(--line);vertical-align:middle}
+table.who td:first-child{font-family:var(--f-display);font-weight:700;font-size:22px;width:30%}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:14px}
+.stat{display:flex;justify-content:space-between;gap:12px;padding-block:8px;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}
+.stat:last-child{border-bottom:0}
+.stat b{font-family:var(--f-display);font-size:18px}
+.badge{display:inline-block;font-size:12.5px;font-weight:700;border-radius:999px;padding:2px 9px;background:var(--sunk);color:var(--muted)}
+.badge.good{background:var(--good-soft);color:var(--good)}
+.list{display:flex;flex-direction:column;gap:10px}
+.item{display:flex;gap:14px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap}
+.item>div:first-child{min-width:0;flex:1 1 220px}
+input[type=text],textarea{font:inherit;font-size:18px;width:100%;padding:10px 12px;border-radius:10px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink)}
+textarea{min-height:110px;resize:vertical}
+.frame{display:flex;flex-direction:column;gap:8px;padding-block:12px;border-bottom:1px solid var(--line)}
+.frame:last-of-type{border-bottom:0}
+.frame-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px}
+.frame-head .es-md{font-size:22px}
+.conf{display:flex;gap:8px;flex-wrap:wrap}
+.conf .chip{min-width:48px;justify-content:center}
+.banner{border-radius:10px;padding:10px 14px;font-size:15px;background:var(--warn-soft);color:var(--ink)}
+.rec{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.rec .dot{width:12px;height:12px;border-radius:50%;background:var(--warn);animation:pulse 1s infinite}
+@keyframes pulse{50%{opacity:.3}}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(18px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:12px;max-width:min(92vw,520px);font-size:15.5px;z-index:20;box-shadow:0 8px 24px rgba(0,0,0,.25)}
+.celebrate{font-family:var(--f-display);font-weight:800;font-size:28px;color:var(--primary)}
+.cando li{margin-block:6px}
+.cando{padding-left:22px;margin:0}
+details summary{cursor:pointer;font-weight:700;min-height:40px;display:flex;align-items:center}
+footer{padding-block:24px 40px;color:var(--muted);font-size:14px}
+select{font:inherit;font-size:16px;padding:8px 10px;border-radius:10px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);max-width:100%}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<div id="app">
+  <header class="top">
+    <div class="wrap">
+      <div class="brandrow">
+        <a class="brand" href="#home" data-nav="home">Clases de <span>Español</span></a>
+        <span class="small muted" id="savestate"></span>
+      </div>
+      <nav class="nav" aria-label="Main menu">
+        <a href="#home" data-nav="home">Home</a>
+        <a href="#lessons" data-nav="lessons">My lessons</a>
+        <a href="#words" data-nav="words">Words</a>
+        <a href="#practice" data-nav="practice">Practice</a>
+        <a href="#listen" data-nav="listen">Listen &amp; speak</a>
+        <a href="#progress" data-nav="progress">My progress</a>
+      </nav>
+    </div>
+  </header>
+  <main class="wrap" id="main" tabindex="-1"></main>
+  <footer class="wrap">
+    <p>Clases de Español · Your progress is saved only in this browser, on this device.</p>
+  </footer>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+<script>
+"use strict";
+/* ============ CONTENT (lesson 1) ============ */
+const LESSONS = [{
+  id: "s01",
+  title: "Mi mundo en español",
+  titleEn: "My world in Spanish",
+  goal: "Say what you and other people do, using yo, tú, él and ella with regular -ar verbs.",
+  unit: "School unit: to be confirmed",
+  words: [
+    {es:"estudiar", en:"to study", icon:"📚", guide:"es-too-<b>DYAR</b>", tip:"Three beats: es-tu-diar. Keep each vowel short and clean."},
+    {es:"escuchar", en:"to listen (to)", icon:"🎧", guide:"es-koo-<b>CHAR</b>", tip:"ch sounds like the ch in “chair”."},
+    {es:"practicar", en:"to practice", icon:"🏋️", guide:"prahk-tee-<b>KAR</b>", tip:"Both c’s sound like k."},
+    {es:"dibujar", en:"to draw", icon:"✏️", guide:"dee-boo-<b>HAR</b>", tip:"The j is a breathy h from the back of your throat."},
+    {es:"preparar", en:"to prepare", icon:"🍳", guide:"preh-pah-<b>RAR</b>", tip:"Each r here is a quick tap, like the tt in American “butter”."},
+    {es:"música", en:"music", icon:"🎵", guide:"<b>MOO</b>-see-kah", tip:"The accent mark shows the strong part: MÚ."},
+    {es:"amigo", en:"friend", icon:"🤝", guide:"ah-<b>MEE</b>-goh", tip:"End with a short, clean o. Don’t slide into “oh-oo”."},
+    {es:"escuela", en:"school", icon:"🏫", guide:"es-<b>KWEH</b>-lah", tip:"ue sounds like “weh”."}
+  ],
+  phrases: [
+    {es:"Yo estudio español.", en:"I study Spanish.", guide:"yoh es-<b>TOO</b>-dyoh es-pah-<b>NYOHL</b>", tip:"With yo, estudiar ends in -o: estudio. The ñ is close to the “ny” in “canyon”, so listen to the audio."},
+    {es:"Tú escuchas música.", en:"You listen to music.", guide:"too es-<b>KOO</b>-chahs <b>MOO</b>-see-kah", tip:"Keep the final s in escuchas. With tú, the verb ends in -as."},
+    {es:"Mi amigo practica fútbol.", en:"My friend practices soccer.", guide:"mee ah-<b>MEE</b>-goh prahk-<b>TEE</b>-kah <b>FOOT</b>-bohl", tip:"Mi amigo is like él (he), so the verb ends in -a. Fútbol is strong on FÚT."},
+    {es:"Mi hermana dibuja un personaje.", en:"My sister draws a character.", guide:"mee ehr-<b>MAH</b>-nah dee-<b>BOO</b>-hah oon pehr-soh-<b>NAH</b>-heh", tip:"The h in hermana is silent. The j in dibuja and personaje is a breathy h."}
+  ],
+  /* bank: diag = starting check (C1–C4) · practice = practice set · transfer = new sentences, only in the final check.
+     check:true = repeated in the final check. */
+  exercises: [
+    {id:"e1", es:"Yo ___ español.", en:"I ___ Spanish.", verb:"study", ok:"estudio", others:["estudias","estudia"], who:"yo", bank:"diag", check:true},
+    {id:"e2", es:"Tú ___ música.", en:"You ___ to music.", verb:"listen", ok:"escuchas", others:["escucho","escucha"], who:"tú", bank:"diag"},
+    {id:"e3", es:"Mi amigo ___ fútbol.", en:"My friend ___ soccer.", verb:"practices", ok:"practica", others:["practico","practicas"], who:"mi amigo", bank:"diag", check:true},
+    {id:"e4", es:"Ella ___ español.", en:"She ___ Spanish.", verb:"studies", ok:"estudia", others:["estudias","estudio"], who:"ella", bank:"diag"},
+    {id:"e5", es:"Tú ___ una presentación.", en:"You ___ a presentation.", verb:"prepare", ok:"preparas", others:["preparo","prepara"], who:"tú", bank:"transfer"},
+    {id:"e6", es:"Mi hermana ___ un personaje.", en:"My sister ___ a character.", verb:"draws", ok:"dibuja", others:["dibujo","dibujas"], who:"mi hermana", bank:"transfer"},
+    {id:"e7", es:"Yo ___ una canción.", en:"I ___ to a song.", verb:"listen", ok:"escucho", others:["escucha","escuchas"], who:"yo", bank:"practice"},
+    {id:"e8", es:"Él ___ para su clase.", en:"He ___ for his class.", verb:"practices", ok:"practica", others:["practicas","practico"], who:"él", bank:"practice"},
+    {id:"p1", es:"Yo ___ la cena.", en:"I ___ dinner.", verb:"prepare", ok:"preparo", others:["preparas","prepara"], who:"yo", bank:"practice"},
+    {id:"p2", es:"Tú ___ fútbol.", en:"You ___ soccer.", verb:"practice", ok:"practicas", others:["practico","practica"], who:"tú", bank:"practice"},
+    {id:"p3", es:"Mi amiga ___ música.", en:"My friend ___ to music.", verb:"listens", ok:"escucha", others:["escucho","escuchas"], who:"mi amiga", bank:"practice"},
+    {id:"p4", es:"Él ___ en la escuela.", en:"He ___ at school.", verb:"studies", ok:"estudia", others:["estudio","estudias"], who:"él", bank:"practice"},
+    {id:"p5", es:"Ella ___ un perro.", en:"She ___ a dog.", verb:"draws", ok:"dibuja", others:["dibujo","dibujas"], who:"ella", bank:"practice"},
+    {id:"p6", es:"Tú ___ en casa.", en:"You ___ at home.", verb:"study", ok:"estudias", others:["estudio","estudia"], who:"tú", bank:"practice"}
+  ],
+  project: {
+    frames: [
+      {id:"f1", es:"Me llamo", en:"My name is", chips:[], tip:"Write your name or a nickname."},
+      {id:"f2", es:"Me gusta", en:"I like", chips:["la música","el fútbol","el básquetbol","dibujar"], tip:"Choose something you like."},
+      {id:"f3", es:"Yo estudio", en:"I study", chips:["español","música","arte"], tip:"Uses the pattern: yo + estudio."},
+      {id:"f4", es:"Yo practico", en:"I practice", chips:["fútbol","básquetbol","la guitarra"], tip:"Uses the pattern: yo + practico."}
+    ],
+    example: ["Me llamo Alex.","Me gusta la música.","Yo estudio español.","Yo practico básquetbol."]
+  }
+}];
+const WHO = {
+  "yo":{en:"I", end:"-o", why:"Yo means I, so the verb ends in -o."},
+  "tú":{en:"you", end:"-as", why:"Tú means you, so the verb ends in -as."},
+  "él":{en:"he", end:"-a", why:"Él means he, so the verb ends in -a."},
+  "ella":{en:"she", end:"-a", why:"Ella means she, so the verb ends in -a."},
+  "mi amigo":{en:"my friend (he)", end:"-a", why:"Mi amigo is one person, like él (he). The verb ends in -a."},
+  "mi amiga":{en:"my friend (she)", end:"-a", why:"Mi amiga is one person, like ella (she). The verb ends in -a."},
+  "mi hermana":{en:"my sister (she)", end:"-a", why:"Mi hermana is like ella (she). The verb ends in -a."}
+};
+const STEP_NAMES = ["Learn words","Build a sentence","Listen & repeat","Your mini project","See your progress"];
+
+/* ============ STORAGE ============ */
+const KEY = "clases-espanol.student.v1";
+let storageOK = true;
+function blankLesson(){return {step:0, wordsSeen:[], wordsHard:[], phrasesDone:[], confStart:null, confEnd:null, runs:[], project:{fields:{}, read:false, savedAt:null}, finishedAt:null};}
+function load(){
+  try{const raw = localStorage.getItem(KEY); if(raw){const d = JSON.parse(raw); if(d && d.lessons) return d;}}
+  catch(e){storageOK = false;}
+  return {lessons:{}, current:"s01", voice:null};
+}
+const DB = load();
+function save(){
+  if(!storageOK) return;
+  try{localStorage.setItem(KEY, JSON.stringify(DB)); flash("Saved");}
+  catch(e){storageOK = false; render();}
+}
+function prog(id){ id = id || DB.current; if(!DB.lessons[id]) DB.lessons[id] = blankLesson(); return DB.lessons[id]; }
+function lesson(){ return LESSONS.find(l=>l.id===DB.current) || LESSONS[0]; }
+let flashT;
+function flash(t){const el=document.getElementById("savestate"); el.textContent=t; clearTimeout(flashT); flashT=setTimeout(()=>el.textContent="",1400);}
+
+/* ============ UI STATE (not saved) ============ */
+const ui = {view:"home", w:{i:0, phase:0}, gram:"learn", ph:0, run:null, review:{i:0, show:false, filter:"all"}, help:false, open:null, confirmReset:false};
+
+/* ============ HELPERS ============ */
+const $ = s=>document.querySelector(s);
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function shuffle(a){a=a.slice(); for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]];} return a;}
+let toastT;
+function toast(msg){const t=$("#toast"); t.textContent=msg; t.hidden=false; clearTimeout(toastT); toastT=setTimeout(()=>t.hidden=true,5200);}
+function blankify(s){return esc(s).replace("___",'<span class="blank" aria-label="blank">?</span>');}
+function fill(s,w){return s.replace("___",w);}
+
+/* ============ VOICE (text to speech) ============ */
+const Voice = {
+  ok: !!window.speechSynthesis && typeof window.SpeechSynthesisUtterance !== "undefined", list: [], loaded:false,
+  rank(v){const l=v.lang.replace("_","-").toLowerCase(); return l==="es-mx"?0:l==="es-us"?1:l==="es-419"?2:l.startsWith("es")?3:9;},
+  init(){
+    if(!this.ok) return;
+    const loadV = ()=>{
+      const all = speechSynthesis.getVoices();
+      if(!all.length) return;
+      this.loaded = true;
+      this.list = all.filter(v=>/^es([-_]|$)/i.test(v.lang)).sort((a,b)=>this.rank(a)-this.rank(b));
+      if(ui.view==="listen") render();
+    };
+    loadV();
+    if(speechSynthesis.addEventListener) speechSynthesis.addEventListener("voiceschanged", loadV); else speechSynthesis.onvoiceschanged = loadV;
+    setTimeout(()=>{ if(!this.loaded){ this.loaded = true; if(ui.view==="listen") render(); } }, 2500);
+  },
+  pick(){ return this.list.find(v=>v.voiceURI===DB.voice) || this.list[0] || null; },
+  speak(text, rate){
+    if(!this.ok){ toast("This browser can’t play spoken audio. You can still read the words and the sound guide."); return; }
+    Rec.stop();
+    try{
+      speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(text);
+      const v = this.pick();
+      if(v){ u.voice = v; u.lang = v.lang; } else { u.lang = "es-MX"; }
+      u.rate = rate || 1;
+      u.onerror = e=>{ if(e.error!=="canceled" && e.error!=="interrupted") toast("The audio didn’t play. Check that your sound is on and try again."); };
+      speechSynthesis.speak(u);
+      if(this.loaded && !this.list.length) toast("This device has no Spanish voice, so the audio may sound wrong. Ask your tutor how to add one.");
+    }catch(e){ toast("The audio didn’t play. Try again."); }
+  },
+  stop(){ if(this.ok) try{speechSynthesis.cancel();}catch(e){} }
+};
+
+/* ============ RECORDER (optional, local only) ============ */
+const Rec = {
+  mr:null, stream:null, chunks:[], key:null, urls:{}, t0:0, tick:null, cap:null, state:"idle",
+  supported(){ return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia && window.MediaRecorder); },
+  async start(key){
+    Voice.stop(); this.stop();
+    if(!this.supported()){ toast("Recording isn’t available in this browser. Listen and repeat out loud instead. That works just as well."); return; }
+    try{ this.stream = await navigator.mediaDevices.getUserMedia({audio:true}); }
+    catch(e){
+      const m = (e && e.name==="NotAllowedError") ? "Microphone access is off, so recording is skipped. You can still listen and repeat out loud."
+              : (e && e.name==="NotFoundError") ? "No microphone was found. You can still listen and repeat out loud."
+              : "Recording didn’t start. You can still listen and repeat out loud.";
+      toast(m); return;
+    }
+    const types = ["audio/webm;codecs=opus","audio/mp4","audio/webm","audio/ogg"];
+    const mime = types.find(t=>MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(t));
+    try{ this.mr = new MediaRecorder(this.stream, mime?{mimeType:mime}:undefined); }
+    catch(e){ this.release(); toast("Recording didn’t start. You can still listen and repeat out loud."); return; }
+    this.chunks = []; this.key = key; this.state = "recording";
+    this.mr.ondataavailable = e=>{ if(e.data && e.data.size) this.chunks.push(e.data); };
+    this.mr.onstop = ()=>{
+      const k = this.key;
+      if(this.chunks.length){
+        if(this.urls[k]) URL.revokeObjectURL(this.urls[k]);
+        this.urls[k] = URL.createObjectURL(new Blob(this.chunks, {type:this.mr.mimeType || "audio/webm"}));
+      }
+      this.release(); this.state = "idle"; render();
+    };
+    this.mr.start(); this.t0 = Date.now();
+    this.tick = setInterval(()=>{ const el=document.getElementById("rec-time"); if(el) el.textContent = Math.min(20,Math.floor((Date.now()-this.t0)/1000))+"s / 20s"; }, 250);
+    this.cap = setTimeout(()=>this.stop(), 20000);
+    render();
+  },
+  stop(){
+    clearInterval(this.tick); clearTimeout(this.cap);
+    if(this.mr && this.mr.state==="recording"){ try{ this.mr.stop(); }catch(e){ this.release(); this.state="idle"; } }
+  },
+  release(){ if(this.stream){ this.stream.getTracks().forEach(t=>t.stop()); this.stream = null; } },
+  play(key){ const u = this.urls[key]; if(!u) return; Voice.stop(); const a = new Audio(u); a.play().catch(()=>toast("Your recording didn’t play. Try recording again.")); },
+  clearAll(){ this.stop(); this.release(); Object.values(this.urls).forEach(u=>URL.revokeObjectURL(u)); this.urls = {}; }
+};
+function stopMedia(){ Voice.stop(); Rec.stop(); }
+
+/* ============ EXERCISE RUNS ============ */
+function bank(kind){
+  const L = lesson();
+  if(kind==="practice") return L.exercises.filter(e=>e.bank==="practice");
+  if(kind==="diag") return L.exercises.filter(e=>e.bank==="diag");
+  return L.exercises.filter(e=>e.check).concat(L.exercises.filter(e=>e.bank==="transfer")); // final check
+}
+function newRun(kind, where){
+  return {kind, where, items:bank(kind).map(e=>({id:e.id, order:shuffle([e.ok].concat(e.others)), first:null, help:0, meaning:false, tries:[]})), i:0, startedAt:Date.now(), saved:false};
+}
+function exById(id){ return lesson().exercises.find(e=>e.id===id); }
+function finishRun(run){
+  if(run.saved) return;
+  run.saved = true;
+  prog().runs.push({kind:run.kind, at:Date.now(), items:run.items.map(it=>({id:it.id, chosen:it.first, correct:it.first===exById(it.id).ok, help:it.help>0 || it.meaning}))});
+  save();
+}
+const KIND_NAME = {practice:"Practice set", diag:"Starting check", check:"Final check"};
+function scoreOf(r){ const c = r.items.filter(x=>x.correct && !x.help).length; return {c, n:r.items.length}; }
+function lastRun(kind){ const rs = prog().runs.filter(r=>r.kind===kind); return rs[rs.length-1] || null; }
+
+function runView(run, opts){
+  opts = opts || {};
+  const it = run.items[run.i], e = exById(it.id), w = WHO[e.who];
+  const answered = it.tries.length > 0;
+  const lastTry = it.tries[it.tries.length-1];
+  const isRight = lastTry === e.ok;
+  const hints = run.kind==="practice";
+  let h = `<div class="stack">
+    <div class="row" style="justify-content:space-between"><span class="eyebrow">Question ${run.i+1} of ${run.items.length}</span>${run.kind==="check" && e.bank==="transfer" ? '<span class="badge">New sentence</span>' : ''}</div>
+    <p class="muted">Choose the word that completes the sentence.</p>
+    <p class="sentence" lang="es">${blankify(e.es)}</p>
+    <div class="row">
+      <button class="btn" data-a="say" data-t="${esc(fill(e.es,"…"))}"><span class="ico" aria-hidden="true">🔊</span>Listen</button>
+      ${hints ? `<button class="btn" data-a="meaning" ${it.meaning?'disabled':''}>Show meaning</button>
+      <button class="btn" data-a="exhelp" ${it.help?'disabled':''}>I need help</button>` : ''}
+    </div>
+    ${it.meaning ? `<p class="note">Meaning: <strong>${esc(e.en.replace("___", e.verb))}</strong></p>` : ''}
+    ${it.help ? `<p class="tip"><strong>Who is doing it?</strong> ${esc(e.who)} = ${esc(w.en)}. ${esc(w.why)}</p>` : ''}
+    <div class="opts" role="group" aria-label="Answer choices">
+      ${it.order.map(o=>{
+        const cls = answered && lastTry===o ? (o===e.ok?"right":"wrong") : "";
+        const dis = answered && (isRight || lastTry===o) ? "disabled" : "";
+        return `<button class="opt ${cls}" lang="es" data-a="answer" data-o="${esc(o)}" ${dis}>${esc(o)}</button>`;
+      }).join("")}
+    </div>`;
+  if(answered){
+    if(isRight){
+      h += `<div class="fb ok" role="status"><strong>Correct!</strong>With ${esc(e.who)}, use <span lang="es">${esc(e.ok)}</span>. ${esc(w.why)}<br><span lang="es">${esc(fill(e.es,e.ok))}</span> = ${esc(e.en.replace("___",e.verb))}</div>`;
+    } else {
+      h += `<div class="fb no" role="status"><strong>Not yet. Try this pattern.</strong>${esc(e.who)} + <span lang="es">${esc(e.ok)}</span>. ${esc(w.why)}</div>`;
+    }
+    if(!isRight || it.first!==e.ok) h += `<p class="small muted">Only your first answer counts in your progress. Trying again helps you learn.</p>`;
+  }
+  h += `<div class="row">`;
+  if(answered && !isRight) h += `<button class="btn primary" data-a="retry">Try again</button>`;
+  if(answered && isRight) h += `<button class="btn primary big" data-a="nextq">${run.i+1<run.items.length ? "Next question" : "See result"}</button>`;
+  h += `</div></div>`;
+  return h;
+}
+function runSummary(run){
+  const s = scoreOf({items:run.items.map(it=>({correct:it.first===exById(it.id).ok, help:it.help>0||it.meaning}))});
+  return s;
+}
+
+/* ============ VIEWS ============ */
+function stepHeader(n){
+  return `<div class="stepbar">
+    <span class="eyebrow">Step ${n+1} of 5 · ${STEP_NAMES[n]}</span>
+    <div class="steps" aria-hidden="true">${STEP_NAMES.map((_,i)=>`<i class="${i<n?'done':i===n?'now':''}"></i>`).join("")}</div>
+  </div>`;
+}
+function navRow(prevLabel, nextHTML){
+  return `<div class="row" style="justify-content:space-between;margin-top:8px">
+    <button class="btn ghost" data-a="back">← ${prevLabel || "Back"}</button>${nextHTML || ""}</div>`;
+}
+function helpBox(text){
+  return `<div><button class="btn ghost" data-a="togglehelp" aria-expanded="${ui.help}">${ui.help?"Hide help":"I need help"}</button>
+    ${ui.help ? `<p class="tip">${text}</p>` : ""}</div>`;
+}
+
+function viewHome(){
+  const p = prog(), L = lesson();
+  const started = p.wordsSeen.length || p.runs.length || p.step>0;
+  return `<section class="hero stack">
+    <p class="eyebrow">Lesson 1 · ${esc(L.titleEn)}</p>
+    <h1>Your Spanish starts here</h1>
+    <p class="muted" style="font-size:19px;max-width:36ch">Listen, try it, and see your progress. It’s okay to make mistakes.</p>
+    <div class="row"><button class="btn primary big" data-a="startlesson">${started && !p.finishedAt ? "Continue lesson 1" : p.finishedAt ? "Do lesson 1 again" : "Start lesson 1"} →</button></div>
+  </section>
+  <section class="card stack" style="margin-top:20px">
+    <h3>What you’ll do</h3>
+    <ol class="stack-sm" style="margin:0;padding-left:22px">${STEP_NAMES.map((s,i)=>`<li>${s}${i<p.step||p.finishedAt?' <span class="badge good">Done</span>':''}</li>`).join("")}</ol>
+    <p class="small muted">About 20 minutes. You can stop anytime and come back. Your place is saved on this device.</p>
+  </section>
+  <section class="card stack" style="margin-top:14px">
+    <h3>Before you start (optional)</h3>
+    <p class="small muted">How sure do you feel about Spanish right now? 1 = not at all, 5 = very sure. This is just for you and your tutor. It isn’t a grade.</p>
+    ${confRow("confStart")}
+  </section>
+  ${storageNote()}`;
+}
+function confRow(field){
+  const v = prog()[field];
+  return `<div class="conf" role="group" aria-label="Confidence from 1 to 5">${[1,2,3,4,5].map(n=>`<button class="chip ${v===n?'on':''}" data-a="conf" data-f="${field}" data-v="${n}" aria-pressed="${v===n}">${n}</button>`).join("")}</div>`;
+}
+function storageNote(){
+  return storageOK ? "" : `<p class="banner" style="margin-top:14px">This browser isn’t saving your progress (private mode or blocked storage). You can still do the lesson, but it will reset when you close the page.</p>`;
+}
+
+function viewLesson(){
+  const p = prog();
+  const s = p.step;
+  if(s===0) return stepWords();
+  if(s===1) return stepGrammar();
+  if(s===2) return stepPhrases();
+  if(s===3) return stepProject();
+  return stepFinish();
+}
+function stepWords(){
+  const L = lesson(), n = L.words.length, i = ui.w.i;
+  if(i>=n){
+    return `<div class="stack">${stepHeader(0)}
+      <h2>Nice. You met ${n} new words.</h2>
+      <p class="muted">Next: put them in sentences. You’ll learn who is doing the action.</p>
+      ${navRow("Words", `<button class="btn primary big" data-a="nextstep">Next: Build a sentence →</button>`)}</div>`;
+  }
+  const w = L.words[i], ph = ui.w.phase;
+  const primary = ph===0 ? `<button class="btn primary big" data-a="wlisten"><span class="ico" aria-hidden="true">🔊</span>Listen</button>`
+    : ph===1 ? `<button class="btn primary big" data-a="wsaid">I said it out loud</button>`
+    : ph===2 ? `<button class="btn primary big" data-a="wmeaning">Show meaning</button>`
+    : `<button class="btn primary big" data-a="wnext">${i+1<n ? "Next word →" : "Finish words →"}</button>`;
+  const instr = ph===0 ? "Listen to the word." : ph===1 ? "Now say it out loud. Use the sound guide if it helps." : ph===2 ? "Check what it means." : "Got it. Ready for the next one?";
+  return `<div class="stack">${stepHeader(0)}
+    ${i===0 && ph===0 ? `<p class="note">How it works: <strong>Listen → Say it → Check the meaning.</strong> Example: escuela → you hear it, you say “es-KWEH-lah”, then you see it means “school”.</p>` : ""}
+    <div class="card stack">
+      <div class="row" style="justify-content:space-between"><span class="eyebrow">Word ${i+1} of ${n}</span><span class="icon-big" aria-hidden="true">${w.icon}</span></div>
+      <p class="es" lang="es">${esc(w.es)}</p>
+      ${ph>=1 ? `<div class="stack-sm"><span class="label">Sound guide · approximate</span><span class="guide">${w.guide}</span><p class="small muted">The big letters are the strong part. The guide helps, but the audio is the real model.</p></div>` : ""}
+      ${ph>=3 ? `<p style="font-size:22px"><strong>${esc(w.en)}</strong></p><p class="tip">${esc(w.tip)}</p>` : ""}
+      <p class="muted">${instr}</p>
+      <div class="row">${primary}
+        ${ph>=1 ? `<button class="btn" data-a="say" data-t="${esc(w.es)}"><span class="ico" aria-hidden="true">🔊</span>Listen again</button>` : ""}
+        <button class="btn" data-a="say" data-t="${esc(w.es)}" data-r="0.6">Play slowly</button>
+      </div>
+    </div>
+    ${helpBox("Tap Listen and repeat the word out loud, even quietly. Nobody grades this part. If the audio doesn’t play, read the sound guide and go on.")}
+    ${navRow(i===0?"Home":"Previous word")}</div>`;
+}
+function stepGrammar(){
+  const L = lesson();
+  if(ui.gram==="learn"){
+    return `<div class="stack">${stepHeader(1)}
+      <h2>Who is doing it?</h2>
+      <p class="muted">In Spanish, the end of the verb changes depending on who does the action.</p>
+      <div class="card"><table class="who"><tbody>
+        ${[["yo","I"],["tú","you"],["él","he"],["ella","she"]].map(([s,e])=>`<tr><td lang="es">${s}</td><td>= ${e}</td><td style="text-align:right"><button class="btn ghost" data-a="say" data-t="${s}" aria-label="Listen to ${s}">🔊 Listen</button></td></tr>`).join("")}
+      </tbody></table></div>
+      <div class="card stack">
+        <span class="label">The rule</span>
+        <p style="font-size:18px">For regular <strong>-ar</strong> verbs, remove <strong>-ar</strong>. Add <strong>-o</strong> for yo, <strong>-as</strong> for tú, and <strong>-a</strong> for él or ella.</p>
+        <div class="model" lang="es"><span class="pill">estudi<span class="end">ar</span></span> → <span>yo</span> + <span class="pill">estudi<span class="end">o</span></span> <span class="muted" style="font-family:var(--f-body);font-size:17px;font-weight:500" lang="en">= I study</span></div>
+        <div class="model" lang="es"><span>tú</span> + <span class="pill">estudi<span class="end">as</span></span> <span class="muted" style="font-family:var(--f-body);font-size:17px;font-weight:500" lang="en">= you study</span></div>
+        <div class="model" lang="es"><span>él / ella</span> + <span class="pill">estudi<span class="end">a</span></span> <span class="muted" style="font-family:var(--f-body);font-size:17px;font-weight:500" lang="en">= he / she studies</span></div>
+      </div>
+      <div class="card stack">
+        <span class="label">Solved example</span>
+        <p class="sentence" lang="es">Yo <span class="blank">estudio</span> español.</p>
+        <p class="muted">I study Spanish. Yo means I, so estudiar becomes <strong lang="es">estudio</strong>.</p>
+        <div class="row"><button class="btn" data-a="say" data-t="Yo estudio español.">🔊 Listen</button></div>
+      </div>
+      ${navRow("Words", `<button class="btn primary big" data-a="gramstart">Try it yourself →</button>`)}</div>`;
+  }
+  if(ui.gram==="done"){
+    const r = lastRun("practice"); const s = r ? scoreOf(r) : {c:0,n:0};
+    return `<div class="stack">${stepHeader(1)}
+      <h2>You built ${s.n} sentences.</h2>
+      <div class="card stack-sm"><div class="stat"><span>Right on the first try, no help</span><b>${s.c} of ${s.n}</b></div></div>
+      <p class="muted">Next: listen to full sentences and say them out loud.</p>
+      ${navRow("Rule", `<button class="btn primary big" data-a="nextstep">Next: Listen &amp; repeat →</button>`)}</div>`;
+  }
+  if(!ui.run || ui.run.where!=="lesson" || ui.run.kind!=="practice") ui.run = newRun("practice","lesson");
+  const run = ui.run;
+  if(run.done){
+    const s = runSummary(run);
+    return `<div class="stack">${stepHeader(1)}
+      <h2>You built ${run.items.length} sentences.</h2>
+      <div class="card stack-sm"><div class="stat"><span>Right on the first try, no help</span><b>${s.c} of ${s.n}</b></div></div>
+      <p class="muted">Next: listen to full sentences and say them out loud.</p>
+      ${navRow("Rule", `<button class="btn primary big" data-a="nextstep">Next: Listen &amp; repeat →</button>`)}</div>`;
+  }
+  return `<div class="stack">${stepHeader(1)}${runView(run)}${navRow(run.i===0?"Rule":"Back")}</div>`;
+}
+function phraseCard(ph, key){
+  const rec = Rec.state==="recording" && Rec.key===key;
+  return `<div class="card stack">
+    <p class="es-md" lang="es">${esc(ph.es)}</p>
+    <p style="font-size:18px">${esc(ph.en)}</p>
+    <div class="stack-sm"><span class="label">Sound guide · approximate</span><span class="guide">${ph.guide}</span></div>
+    <p class="tip">${esc(ph.tip)}</p>
+    <div class="row">
+      <button class="btn primary" data-a="say" data-t="${esc(ph.es)}"><span class="ico" aria-hidden="true">🔊</span>Listen</button>
+      <button class="btn" data-a="say" data-t="${esc(ph.es)}" data-r="0.6">Play slowly</button>
+    </div>
+    <div class="stack-sm">
+      <span class="label">Optional · record yourself</span>
+      <div class="rec">
+        ${rec ? `<span class="dot" aria-hidden="true"></span><span id="rec-time" aria-live="off">0s / 20s</span><button class="btn" data-a="recstop">■ Stop</button>`
+              : `<button class="btn" data-a="rec" data-k="${key}">● Record</button>`}
+        ${Rec.urls[key] && !rec ? `<button class="btn" data-a="recplay" data-k="${key}">▶ Play my recording</button><button class="btn ghost" data-a="say" data-t="${esc(ph.es)}">Compare with the model</button>` : ""}
+      </div>
+      <p class="small muted">Your recording stays on this device and disappears when you leave. Nobody scores it.</p>
+    </div>
+  </div>`;
+}
+function stepPhrases(){
+  const L = lesson(), n = L.phrases.length, i = ui.ph;
+  if(i>=n){
+    return `<div class="stack">${stepHeader(2)}
+      <h2>You practiced ${n} sentences out loud.</h2>
+      <p class="muted">Next: write a short profile about yourself, using what you learned.</p>
+      ${navRow("Sentences", `<button class="btn primary big" data-a="nextstep">Next: Your mini project →</button>`)}</div>`;
+  }
+  return `<div class="stack">${stepHeader(2)}
+    <p class="muted">Listen first. Then say the sentence aloud. Repeat as many times as you like. There’s no timer.</p>
+    <span class="eyebrow">Sentence ${i+1} of ${n}</span>
+    ${phraseCard(L.phrases[i], "ph"+i)}
+    ${helpBox("Tap Listen, then say the whole sentence out loud. Use Play slowly to hear each part. Recording is optional. If it doesn’t work, just repeat out loud.")}
+    ${navRow(i===0?"Build a sentence":"Previous", `<button class="btn primary big" data-a="phnext">${i+1<n?"Next sentence →":"Done →"}</button>`)}</div>`;
+}
+function projectText(){
+  const f = prog().project.fields, L = lesson();
+  return L.project.frames.filter(fr=>(f[fr.id]||"").trim()).map(fr=>`${fr.es} ${f[fr.id].trim().replace(/[.!]+$/,"")}.`).join(" ");
+}
+function stepProject(standalone){
+  const L = lesson(), p = prog(), f = p.project.fields;
+  const text = projectText();
+  return `<div class="stack">${standalone ? "" : stepHeader(3)}
+    <h2>Write a short profile about yourself</h2>
+    <p class="muted">Finish one or two sentences. That’s enough to start. Tap a word to use it, or type your own.</p>
+    <details class="card"><summary>See an example</summary>
+      <p lang="es" class="es-md" style="font-size:20px;margin-top:8px">${L.project.example.map(esc).join(" ")}</p>
+      <p class="small muted">Example only. Write about yourself.</p></details>
+    <div class="card">
+      ${L.project.frames.map(fr=>`<div class="frame">
+        <div class="frame-head"><span class="es-md" lang="es">${esc(fr.es)} ___</span><span class="muted">${esc(fr.en)} ___</span></div>
+        <label class="small muted" for="pf-${fr.id}">${esc(fr.tip)}</label>
+        <input type="text" id="pf-${fr.id}" lang="es" autocomplete="off" data-a="pfield" data-f="${fr.id}" value="${esc(f[fr.id]||"")}" maxlength="60">
+        ${fr.chips.length ? `<div class="row">${fr.chips.map(c=>`<button class="chip" lang="es" data-a="pchip" data-f="${fr.id}" data-v="${esc(c)}">${esc(c)}</button>`).join("")}</div>` : ""}
+      </div>`).join("")}
+    </div>
+    <div class="card stack">
+      <span class="label">Your text</span>
+      <p class="es-md" lang="es" style="font-size:21px" id="ptext">${text ? esc(text) : '<span class="muted" style="font-family:var(--f-body);font-size:17px;font-weight:400">Your sentences will appear here.</span>'}</p>
+      <div class="row">
+        <button class="btn" data-a="psay" ${text?"":"disabled"}><span class="ico" aria-hidden="true">🔊</span>Listen to my text</button>
+        <button class="btn" data-a="psay" data-r="0.6" ${text?"":"disabled"}>Play slowly</button>
+      </div>
+      <p class="small muted">Listening reads your words aloud. It doesn’t check your grammar. Your tutor will look at it with you.</p>
+      <label class="row small"><input type="checkbox" data-a="pread" ${p.project.read?"checked":""}> I read my text out loud</label>
+    </div>
+    <p class="small muted">Me llamo and Me gusta are useful phrases. They don’t follow the -ar rule, so they aren’t part of today’s check.</p>
+    ${standalone ? "" : navRow("Listen & repeat", `<button class="btn primary big" data-a="nextstep" ${text?"":"disabled"}>Next: See your progress →</button>`)}
+    ${!standalone && !text ? `<p class="small muted">Write at least one sentence to continue.</p>` : ""}
+  </div>`;
+}
+function stepFinish(){
+  const p = prog();
+  let run = ui.run;
+  const done = lastRun("check");
+  if(!(run && run.where==="lesson" && run.kind==="check")){
+    if(!ui.checkStarted){
+      return `<div class="stack">${stepHeader(4)}
+        <h2>Quick check</h2>
+        <p class="muted">4 questions with no hints. Two are sentences you’ve seen. Two are new. This shows what you can do on your own.</p>
+        ${done ? `<p class="note">You already did a check. Doing it again adds a new result. Your first one stays in your history.</p><div class="row"><button class="btn" data-a="showsum">See today’s summary</button></div>` : ""}
+        ${navRow("Mini project", `<button class="btn primary big" data-a="checkstart">Start the check →</button>`)}</div>`;
+    }
+    run = ui.run = newRun("check","lesson");
+  }
+  if(!run.done) return `<div class="stack">${stepHeader(4)}${runView(run)}${navRow("Back")}</div>`;
+  return finishSummary();
+}
+function finishSummary(){
+  const p = prog(), L = lesson();
+  const chk = lastRun("check");
+  const rep = chk ? chk.items.filter(x=>!exById(x.id).bank.includes("transfer")) : [];
+  const tr = chk ? chk.items.filter(x=>exById(x.id).bank==="transfer") : [];
+  const ok = a=>a.filter(x=>x.correct).length;
+  const words = p.wordsSeen.length;
+  const cando = [];
+  if(words) cando.push(`Recognize and say ${words} Spanish words.`);
+  if(ok(rep)+ok(tr)>0) cando.push("Pick the right verb for yo, tú, él and ella.");
+  if(ok(tr)>0) cando.push(`Use the pattern in ${ok(tr)===tr.length?"new sentences":"a new sentence"} I hadn’t seen before.`);
+  if(projectText()) cando.push("Write a short profile about myself in Spanish.");
+  if(p.phrasesDone.length) cando.push(`Say ${p.phrasesDone.length} full sentences out loud.`);
+  return `<div class="stack">${stepHeader(4)}
+    <p class="celebrate">Lesson 1 done.</p>
+    <div class="card stack">
+      <h3>Today I can…</h3>
+      ${cando.length ? `<ul class="cando">${cando.map(c=>`<li>${esc(c)}</li>`).join("")}</ul>` : `<p class="muted">Keep going. Every step counts.</p>`}
+    </div>
+    <div class="card stack-sm">
+      <div class="stat"><span>Words practiced</span><b>${words} of ${L.words.length}</b></div>
+      <div class="stat"><span>Check · sentences you’ve seen</span><b>${ok(rep)} of ${rep.length}</b></div>
+      <div class="stat"><span>Check · new sentences</span><b>${ok(tr)} of ${tr.length}</b></div>
+    </div>
+    <p class="small muted">This shows what you did today. It isn’t a grade or a language level.</p>
+    <div class="card stack">
+      <h3>How sure do you feel now?</h3>
+      ${confRow("confEnd")}
+      ${p.confStart ? `<p class="small muted">At the start you chose ${p.confStart}.</p>` : ""}
+    </div>
+    <div class="card stack-sm">
+      <h3>Next activity</h3>
+      <p>Spend 5 minutes in <a href="#words" data-nav="words">Words</a> reviewing the ones marked “Still learning”, then say the 4 sentences in <a href="#listen" data-nav="listen">Listen &amp; speak</a>.</p>
+    </div>
+    <div class="row"><button class="btn primary big" data-a="finishlesson">Finish lesson</button><a class="btn" href="#progress" data-nav="progress">See my progress</a></div>
+  </div>`;
+}
+
+function viewLessons(){
+  return `<div class="stack"><h2>My lessons</h2>
+    ${LESSONS.map(L=>{const p=prog(L.id); return `<div class="card item">
+      <div class="stack-sm"><span class="eyebrow">Lesson 1</span><h3>${esc(L.titleEn)}</h3><p class="small muted" lang="es">${esc(L.title)}</p><p class="small">${esc(L.goal)}</p>
+      <p class="small muted">${p.finishedAt ? "Finished" : p.step>0 || p.wordsSeen.length ? `In progress · step ${p.step+1} of 5` : "Not started"}</p></div>
+      <button class="btn primary" data-a="startlesson">${p.finishedAt?"Do it again":p.step>0||p.wordsSeen.length?"Continue":"Start"} →</button></div>`;}).join("")}
+    <p class="note">More lessons will appear here when your tutor adds them.</p></div>`;
+}
+
+function viewWords(){
+  const L = lesson(), p = prog(), r = ui.review;
+  let list = L.words.map((w,i)=>({w,i}));
+  if(r.filter==="hard") list = list.filter(x=>p.wordsHard.includes(x.w.es));
+  if(!list.length) return `<div class="stack"><h2>Words</h2>${filterRow()}<p class="note">No words marked “Still learning”. Nice work.</p></div>`;
+  if(r.i>=list.length) r.i = 0;
+  const {w} = list[r.i];
+  return `<div class="stack"><h2>Words</h2>
+    <p class="muted">Look at the meaning and try to remember the Spanish word before you check.</p>
+    ${filterRow()}
+    <div class="card stack">
+      <div class="row" style="justify-content:space-between"><span class="eyebrow">${r.i+1} of ${list.length}</span><span class="icon-big" aria-hidden="true">${w.icon}</span></div>
+      <p style="font-size:24px;font-weight:700">${esc(w.en)}</p>
+      ${r.show ? `<p class="es" lang="es">${esc(w.es)}</p><span class="guide">${w.guide}</span><p class="tip">${esc(w.tip)}</p>
+        <div class="row"><button class="btn" data-a="say" data-t="${esc(w.es)}">🔊 Listen</button><button class="btn" data-a="say" data-t="${esc(w.es)}" data-r="0.6">Play slowly</button></div>
+        <div class="row"><button class="btn primary" data-a="rknew">I knew it</button><button class="btn" data-a="rhard">Still learning</button></div>`
+      : `<div class="row"><button class="btn primary big" data-a="rshow">Show the Spanish word</button></div>`}
+    </div>
+    <div class="row" style="justify-content:space-between"><button class="btn ghost" data-a="rprev">← Previous</button><button class="btn ghost" data-a="rnext">Next →</button></div></div>`;
+  function filterRow(){
+    const n = p.wordsHard.length;
+    return `<div class="row" role="group" aria-label="Which words"><button class="chip ${r.filter==="all"?"on":""}" data-a="rfilter" data-v="all" aria-pressed="${r.filter==="all"}">All words</button><button class="chip ${r.filter==="hard"?"on":""}" data-a="rfilter" data-v="hard" aria-pressed="${r.filter==="hard"}">Still learning (${n})</button></div>`;
+  }
+}
+
+function viewPractice(){
+  const run = ui.run;
+  if(run && run.where==="tab"){
+    if(!run.done) return `<div class="stack"><h2>${KIND_NAME[run.kind]}</h2>${runView(run)}<div class="row"><button class="btn ghost" data-a="runquit">← Stop this set</button></div></div>`;
+    const s = runSummary(run);
+    return `<div class="stack"><h2>${KIND_NAME[run.kind]} done</h2>
+      <div class="card stack-sm"><div class="stat"><span>Right on the first try${run.kind==="practice"?", no help":""}</span><b>${s.c} of ${s.n}</b></div></div>
+      <div class="row"><button class="btn primary" data-a="runquit">Back to practice</button></div></div>`;
+  }
+  const lp = lastRun("practice"), ld = lastRun("diag"), lc = lastRun("check");
+  const res = r=> r ? `<span class="badge">Last: ${scoreOf(r).c} of ${scoreOf(r).n}</span>` : `<span class="badge">Not done yet</span>`;
+  return `<div class="stack"><h2>Practice</h2>
+    <p class="muted">Short sets. You can stop anytime.</p>
+    <div class="card item"><div class="stack-sm"><h3>Practice set</h3><p class="small muted">${bank("practice").length} sentences with help available: Show meaning and I need help.</p>${res(lp)}</div><button class="btn primary" data-a="runstart" data-k="practice">Start</button></div>
+    <div class="card item"><div class="stack-sm"><h3>Starting check</h3><p class="small muted">4 sentences, no hints. Do this with your tutor at the start of a class.</p>${res(ld)}</div><button class="btn" data-a="runstart" data-k="diag">Start</button></div>
+    <div class="card item"><div class="stack-sm"><h3>Final check</h3><p class="small muted">4 sentences, no hints, two of them new. Best at the end of the lesson.</p>${res(lc)}</div><button class="btn" data-a="runstart" data-k="check">Start</button></div>
+    ${ui.quitNote ? `<p class="note">You stopped a set before the end, so it wasn’t added to your progress.</p>` : ""}
+  </div>`;
+}
+
+function viewListen(){
+  const L = lesson();
+  const items = L.words.map((w,i)=>({k:"w"+i, es:w.es, en:w.en, guide:w.guide, tip:w.tip})).concat(L.phrases.map((p,i)=>({k:"ph"+i, es:p.es, en:p.en, guide:p.guide, tip:p.tip, phrase:true})));
+  let voiceUI = "";
+  if(!Voice.ok) voiceUI = `<p class="banner">This browser can’t play spoken audio. You can still use the sound guides.</p>`;
+  else if(Voice.loaded && !Voice.list.length) voiceUI = `<p class="banner">This device has no Spanish voice, so the audio may sound wrong. On iPhone: Settings › Accessibility › Spoken Content › Voices › Spanish (Mexico).</p>`;
+  else if(Voice.list.length>1) voiceUI = `<div class="row"><label for="voicesel" class="small muted">Voice</label><select id="voicesel" data-a="voice">${Voice.list.map(v=>`<option value="${esc(v.voiceURI)}" ${Voice.pick()===v?"selected":""}>${esc(v.name)} (${esc(v.lang)})</option>`).join("")}</select></div>`;
+  return `<div class="stack"><h2>Listen &amp; speak</h2>
+    <p class="muted">Listen first. Then say it out loud. Tap Practice to see the sound guide and record yourself.</p>
+    ${voiceUI}
+    <div class="list">${items.map(it=>`<div class="card stack-sm">
+      <div class="item"><div><p class="${it.phrase?"es-md":"es-md"}" lang="es" style="font-size:${it.phrase?22:24}px">${esc(it.es)}</p><p class="muted">${esc(it.en)}</p></div>
+      <div class="row"><button class="btn" data-a="say" data-t="${esc(it.es)}" aria-label="Listen to ${esc(it.es)}">🔊 Listen</button><button class="btn" data-a="say" data-t="${esc(it.es)}" data-r="0.6">Slow</button><button class="btn ghost" data-a="lopen" data-k="${it.k}" aria-expanded="${ui.open===it.k}">${ui.open===it.k?"Close":"Practice"}</button></div></div>
+      ${ui.open===it.k ? `<div class="stack-sm"><span class="label">Sound guide · approximate</span><span class="guide">${it.guide}</span><p class="tip">${esc(it.tip)}</p>${recRow(it.k)}</div>` : ""}
+    </div>`).join("")}</div></div>`;
+}
+function recRow(key){
+  const rec = Rec.state==="recording" && Rec.key===key;
+  return `<div class="rec">${rec ? `<span class="dot" aria-hidden="true"></span><span id="rec-time">0s / 20s</span><button class="btn" data-a="recstop">■ Stop</button>`
+    : `<button class="btn" data-a="rec" data-k="${key}">● Record</button>`}
+    ${Rec.urls[key] && !rec ? `<button class="btn" data-a="recplay" data-k="${key}">▶ Play my recording</button>` : ""}</div>
+    <p class="small muted">Optional. Stays on this device. Nobody scores it.</p>`;
+}
+
+function viewProgress(){
+  const L = lesson(), p = prog();
+  const runs = p.runs.slice().reverse();
+  const shown = k=>{const r = lastRun(k); return r ? `${scoreOf(r).c} of ${scoreOf(r).n}` : "—";};
+  const text = projectText();
+  return `<div class="stack"><h2>My progress</h2>
+    <p class="muted">Lesson 1 · ${esc(L.titleEn)}</p>
+    <div class="grid2">
+      <div class="card stack-sm"><h3>What you did</h3>
+        <div class="stat"><span>Words practiced</span><b>${p.wordsSeen.length} of ${L.words.length}</b></div>
+        <div class="stat"><span>Sentences said out loud</span><b>${p.phrasesDone.length} of ${L.phrases.length}</b></div>
+        <div class="stat"><span>Sets finished</span><b>${p.runs.length}</b></div>
+        <div class="stat"><span>Mini project</span><b>${text ? "Written" : "Not yet"}</b></div>
+        <p class="small muted">Doing activities is practice. It isn’t the same as knowing it on your own.</p>
+      </div>
+      <div class="card stack-sm"><h3>What you showed on your own</h3>
+        <div class="stat"><span>Starting check</span><b>${shown("diag")}</b></div>
+        <div class="stat"><span>Final check</span><b>${shown("check")}</b></div>
+        <div class="stat"><span>Last practice, no help</span><b>${shown("practice")}</b></div>
+        <p class="small muted">Counts answers right on the first try without hints.</p>
+      </div>
+    </div>
+    <div class="card stack-sm"><h3>How sure you felt</h3>
+      <div class="stat"><span>At the start</span><b>${p.confStart ?? "—"}</b></div>
+      <div class="stat"><span>At the end</span><b>${p.confEnd ?? "—"}</b></div>
+      <p class="small muted">Your own feeling, kept apart from your answers.</p>
+    </div>
+    ${p.wordsHard.length ? `<div class="card stack-sm"><h3>Still learning</h3><p lang="es">${p.wordsHard.map(esc).join(" · ")}</p></div>` : ""}
+    ${text ? `<div class="card stack-sm"><h3>My profile</h3><p lang="es" class="es-md" style="font-size:20px">${esc(text)}</p><div class="row"><a class="btn" href="#project" data-nav="project">Edit my profile</a></div></div>` : ""}
+    <div class="card stack-sm"><h3>History</h3>
+      ${runs.length ? runs.map(r=>`<div class="stat"><span>${KIND_NAME[r.kind]} · <span class="muted">${new Date(r.at).toLocaleString([], {month:"short", day:"numeric", hour:"numeric", minute:"2-digit"})}</span></span><b>${scoreOf(r).c} of ${scoreOf(r).n}</b></div>`).join("") : `<p class="muted">Finished sets will show up here.</p>`}
+    </div>
+    <div class="card stack-sm"><h3>Share with your tutor</h3>
+      <p class="small muted">Copies a short summary you can paste in a message to your tutor.</p>
+      <div class="row"><button class="btn" data-a="copysum">Copy my summary</button></div>
+      <textarea id="sumbox" readonly hidden aria-label="Progress summary"></textarea>
+    </div>
+    <details class="card" ${ui.confirmReset?"open":""}><summary>Start lesson 1 over</summary>
+      <div class="stack-sm" style="margin-top:8px">
+        <p class="small muted">This erases your progress for lesson 1 on this device. It can’t be undone.</p>
+        ${ui.confirmReset ? `<div class="row"><button class="btn" data-a="resetyes" style="border-color:var(--warn);color:var(--warn)">Yes, erase lesson 1</button><button class="btn ghost" data-a="resetno">Keep my progress</button></div>`
+          : `<div class="row"><button class="btn" data-a="resetask">Erase lesson 1 progress…</button></div>`}
+      </div></details>
+    ${storageNote()}
+  </div>`;
+}
+function summaryText(){
+  const L = lesson(), p = prog(), sc = k=>{const r=lastRun(k); return r?`${scoreOf(r).c}/${scoreOf(r).n}`:"not done";};
+  return [`Clases de Español — Lesson 1 (${L.title})`,
+    `Words practiced: ${p.wordsSeen.length}/${L.words.length}`,
+    `Still learning: ${p.wordsHard.join(", ") || "none"}`,
+    `Sentences said aloud: ${p.phrasesDone.length}/${L.phrases.length}`,
+    `Starting check (no help): ${sc("diag")}`,
+    `Final check (no help): ${sc("check")}`,
+    `Last practice (no help): ${sc("practice")}`,
+    `Confidence start/end: ${p.confStart ?? "-"} / ${p.confEnd ?? "-"}`,
+    `My profile: ${projectText() || "-"}`].join("\n");
+}
+
+/* ============ RENDER + ROUTER ============ */
+const VIEWS = {home:viewHome, lesson:viewLesson, lessons:viewLessons, words:viewWords, practice:viewPractice, listen:viewListen, progress:viewProgress, project:()=>`<div class="stack">${stepProject(true)}</div>`};
+const NAV_OF = {lesson:"home", project:"progress"};
+function render(keepFocus){
+  const main = $("#main");
+  const active = document.activeElement;
+  const fid = keepFocus && active && active.id;
+  main.innerHTML = (VIEWS[ui.view] || viewHome)();
+  document.querySelectorAll(".nav a").forEach(a=>a.setAttribute("aria-current", a.dataset.nav===(NAV_OF[ui.view]||ui.view) ? "page" : "false"));
+  if(fid){ const el = document.getElementById(fid); if(el){ el.focus(); if(el.setSelectionRange && el.value!=null) el.setSelectionRange(el.value.length, el.value.length); } }
+}
+function go(view, noHash){
+  stopMedia();
+  ui.help = false; ui.open = null; ui.confirmReset = false; ui.quitNote = false;
+  if(ui.run && ui.run.where==="tab" && view!=="practice") ui.run = null;
+  ui.view = VIEWS[view] ? view : "home";
+  if(!noHash){ try{ history.replaceState(null, "", "#"+ui.view); }catch(e){ location.hash = ui.view; } }
+  render();
+  window.scrollTo(0,0);
+  const m = $("#main"); m.focus({preventScroll:true});
+}
+window.addEventListener("hashchange", ()=>{ const v = location.hash.slice(1); if(v && v!==ui.view) go(v, true); });
+
+/* ============ ACTIONS ============ */
+function currentRun(){ return ui.run; }
+document.addEventListener("click", e=>{
+  const nav = e.target.closest("[data-nav]");
+  if(nav){ e.preventDefault(); go(nav.dataset.nav); return; }
+  const el = e.target.closest("[data-a]"); if(!el || el.tagName==="INPUT" || el.tagName==="SELECT") return;
+  const a = el.dataset.a, p = prog(), L = lesson();
+  switch(a){
+    case "startlesson":
+      if(p.finishedAt){ const keep = {confStart:p.confStart, runs:p.runs}; DB.lessons[DB.current] = Object.assign(blankLesson(), keep); save(); }
+      ui.w = {i:0, phase:0}; ui.gram = "learn"; ui.ph = 0; ui.run = null; ui.checkStarted = false;
+      go("lesson"); break;
+    case "conf": p[el.dataset.f] = +el.dataset.v; save(); render(); break;
+    case "say": Voice.speak(el.dataset.t, el.dataset.r ? +el.dataset.r : 1); break;
+    case "togglehelp": ui.help = !ui.help; render(); break;
+    case "back": back(); break;
+    case "nextstep": stopMedia(); p.step = Math.min(4, p.step+1); ui.help = false; if(p.step===1) ui.gram="learn"; if(p.step===2) ui.ph = 0; if(p.step===4){ ui.checkStarted=false; ui.run=null; } save(); render(); window.scrollTo(0,0); break;
+    case "wlisten": { const w = L.words[ui.w.i]; Voice.speak(w.es, 1); ui.w.phase = 1; render(); break; }
+    case "wsaid": ui.w.phase = 2; render(); break;
+    case "wmeaning": { const w = L.words[ui.w.i]; if(!p.wordsSeen.includes(w.es)){ p.wordsSeen.push(w.es); save(); } ui.w.phase = 3; render(); break; }
+    case "wnext": ui.w = {i:ui.w.i+1, phase:0}; render(); break;
+    case "gramstart": ui.gram = "run"; ui.run = newRun("practice","lesson"); render(); window.scrollTo(0,0); break;
+    case "answer": {
+      const run = currentRun(); const it = run.items[run.i]; const ex = exById(it.id); const o = el.dataset.o;
+      if(it.tries[it.tries.length-1]===ex.ok) break;
+      if(it.first===null) it.first = o;
+      it.tries.push(o); render();
+      const fb = document.querySelector(".fb"); if(fb) fb.scrollIntoView({block:"nearest"});
+      break; }
+    case "retry": { const run = currentRun(); const it = run.items[run.i]; it.tries = []; it.retrying = true; render(); break; }
+    case "meaning": { const it = currentRun().items[currentRun().i]; it.meaning = true; render(); break; }
+    case "exhelp": { const it = currentRun().items[currentRun().i]; it.help = 1; render(); break; }
+    case "nextq": { const run = currentRun(); if(run.i+1<run.items.length){ run.i++; } else { run.done = true; finishRun(run); if(run.where==="lesson" && run.kind==="practice") ui.gram = "done"; } render(); window.scrollTo(0,0); break; }
+    case "showsum": ui.checkStarted = true; ui.run = Object.assign(newRun("check","lesson"), {done:true, saved:true}); render(); break;
+    case "checkstart": ui.checkStarted = true; ui.run = newRun("check","lesson"); render(); break;
+    case "phnext": { const k = ui.ph; if(!p.phrasesDone.includes(k)){ p.phrasesDone.push(k); save(); } stopMedia(); ui.ph++; render(); window.scrollTo(0,0); break; }
+    case "rec": Rec.start(el.dataset.k); break;
+    case "recstop": Rec.stop(); break;
+    case "recplay": Rec.play(el.dataset.k); break;
+    case "pchip": { p.project.fields[el.dataset.f] = el.dataset.v; save(); render(); break; }
+    case "psay": Voice.speak(projectText(), el.dataset.r ? +el.dataset.r : 1); break;
+    case "finishlesson": p.finishedAt = Date.now(); save(); go("progress"); break;
+    case "rshow": { ui.review.show = true; render(); break; }
+    case "rknew": case "rhard": {
+      const list = ui.review.filter==="hard" ? L.words.filter(w=>p.wordsHard.includes(w.es)) : L.words;
+      const w = list[ui.review.i]; if(!w) break;
+      if(!p.wordsSeen.includes(w.es)) p.wordsSeen.push(w.es);
+      if(a==="rhard"){ if(!p.wordsHard.includes(w.es)) p.wordsHard.push(w.es); ui.review.i++; }
+      else { const was = p.wordsHard.indexOf(w.es); if(was>=0) p.wordsHard.splice(was,1); else ui.review.i++; }
+      ui.review.show = false; save(); render(); break; }
+    case "rnext": ui.review.i++; ui.review.show = false; stopMedia(); render(); break;
+    case "rprev": ui.review.i = Math.max(0, ui.review.i-1); ui.review.show = false; stopMedia(); render(); break;
+    case "rfilter": ui.review = {i:0, show:false, filter:el.dataset.v}; render(); break;
+    case "runstart": ui.run = newRun(el.dataset.k, "tab"); ui.quitNote = false; render(); break;
+    case "runquit": { const r = ui.run; ui.quitNote = !!(r && !r.done && r.items.some(x=>x.first!==null)); ui.run = null; stopMedia(); render(); break; }
+    case "lopen": stopMedia(); ui.open = ui.open===el.dataset.k ? null : el.dataset.k; render(); break;
+    case "copysum": {
+      const t = summaryText(), box = $("#sumbox");
+      const done = ()=>toast("Copied. Paste it in a message to your tutor.");
+      const fallback = ()=>{ box.hidden = false; box.value = t; box.focus(); box.select(); toast("Select the text below and copy it."); };
+      try{ navigator.clipboard.writeText(t).then(done, fallback); }catch(err){ fallback(); }
+      break; }
+    case "resetask": ui.confirmReset = true; render(); break;
+    case "resetno": ui.confirmReset = false; render(); break;
+    case "resetyes": DB.lessons[DB.current] = blankLesson(); save(); ui.confirmReset = false; ui.run = null; toast("Lesson 1 progress erased on this device."); render(); break;
+  }
+});
+document.addEventListener("input", e=>{
+  const el = e.target;
+  if(el.dataset && el.dataset.a==="pfield"){
+    prog().project.fields[el.dataset.f] = el.value; save();
+    const t = projectText(), out = $("#ptext");
+    if(out) out.textContent = t || "Your sentences will appear here.";
+    document.querySelectorAll('[data-a="psay"]').forEach(b=>b.disabled = !t);
+    const nx = document.querySelector('[data-a="nextstep"]'); if(nx && ui.view==="lesson") nx.disabled = !t;
+  }
+});
+document.addEventListener("change", e=>{
+  const el = e.target;
+  if(el.dataset && el.dataset.a==="pread"){ prog().project.read = el.checked; save(); }
+  if(el.dataset && el.dataset.a==="voice"){ DB.voice = el.value; save(); Voice.speak("Hola", 1); }
+});
+function back(){
+  stopMedia(); ui.help = false;
+  const p = prog();
+  if(ui.view!=="lesson"){ go("home"); return; }
+  const s = p.step;
+  if(s===0){
+    if(ui.w.i>=lesson().words.length){ ui.w = {i:lesson().words.length-1, phase:3}; }
+    else if(ui.w.phase>0) ui.w.phase = 0;
+    else if(ui.w.i>0) ui.w = {i:ui.w.i-1, phase:3};
+    else { go("home"); return; }
+  } else if(s===1){
+    const run = ui.run;
+    if(ui.gram==="run" && run && !run.done && run.i>0){ run.i--; }
+    else if(ui.gram==="run" || ui.gram==="done"){ ui.gram = "learn"; ui.run = null; }
+    else { p.step = 0; ui.w = {i:lesson().words.length, phase:0}; }
+  } else if(s===2){
+    if(ui.ph>0) ui.ph--; else { p.step = 1; ui.gram = lastRun("practice") ? "done" : "learn"; }
+  } else if(s===3){ p.step = 2; ui.ph = lesson().phrases.length-1; }
+  else if(s===4){
+    const run = ui.run;
+    if(run && run.kind==="check" && !run.done && run.i>0) run.i--;
+    else { p.step = 3; ui.checkStarted = false; if(run && run.kind==="check" && !run.done) ui.run = null; }
+  }
+  save(); render(); window.scrollTo(0,0);
+}
+/* stop audio, recording and microphone when leaving or hiding the page */
+document.addEventListener("visibilitychange", ()=>{ if(document.hidden) stopMedia(); });
+window.addEventListener("pagehide", ()=>Rec.clearAll());
+
+/* ============ START ============ */
+Voice.init();
+(function start(){
+  const v = location.hash.slice(1);
+  if(v && VIEWS[v]) ui.view = v;
+  if(ui.view==="lesson"){ ui.w = {i:0, phase:0}; }
+  render();
+})();
+</script>
