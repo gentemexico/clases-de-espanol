@@ -252,6 +252,33 @@ const WHO = {
   "mi amiga":{en:"my friend (she)", end:"-a", why:"Mi amiga is one person, like ella (she). The verb ends in -a."},
   "mi hermana":{en:"my sister (she)", end:"-a", why:"Mi hermana is like ella (she). The verb ends in -a."}
 };
+/* Homework: the tutor updates this list and republishes. auto(p) = done automatically; no auto = the student ticks it. */
+const HOMEWORK = {
+  title:"Homework 1", assigned:"Nov 10", due:"Before your next class",
+  tasks:[
+    {id:"h1", text:"Finish Lesson 1", how:"All 5 steps, including the quick check.", go:"lesson", auto:p=>!!p.finishedAt},
+    {id:"h2", text:"Answer the 6 conversation questions out loud", how:"Listen & speak › Conversation. Tap Show a model answer after each one.", go:"talk", auto:p=>(p.talked||[]).length>=TALK.length},
+    {id:"h3", text:"Listening: Meet Lucía", how:"Practice › Listening. Listen first, then answer.", go:"practice", auto:p=>!!(p.comp&&p.comp.listen)},
+    {id:"h4", text:"Ear test: pero or perro?", how:"Listen & speak › Sound lab › Tap r and rolled rr. Do at least 5 words.", go:"sounds", auto:p=>!!(p.sounds&&p.sounds.r&&p.sounds.r.total>=5)},
+    {id:"h5", text:"Review your words for 5 minutes", how:"Words. Mark the hard ones as Still learning.", go:"words"},
+    {id:"h6", text:"Send your summary to your tutor", how:"My progress › Copy my summary, then paste it in a message.", go:"progress"}
+  ]
+};
+function hwDone(t){ const p = prog(); return t.auto ? t.auto(p) : !!(p.hw && p.hw[t.id]); }
+function homeworkCard(){
+  const n = HOMEWORK.tasks.filter(hwDone).length, all = HOMEWORK.tasks.length;
+  return `<section class="card stack" style="margin-top:20px">
+    <div class="row" style="justify-content:space-between"><h3>${esc(HOMEWORK.title)}</h3><span class="badge ${n===all?"good":""}">${n} of ${all} done</span></div>
+    <p class="small muted">Assigned ${esc(HOMEWORK.assigned)} · Due: ${esc(HOMEWORK.due)}. Short tasks. Do them in any order.</p>
+    <div class="list">${HOMEWORK.tasks.map(t=>{const d = hwDone(t);
+      return `<div class="item" style="border-top:1px solid var(--line);padding-top:10px">
+        <div class="stack-sm"><span style="font-weight:700">${d?"✓ ":""}${esc(t.text)}</span><span class="small muted">${esc(t.how)}</span>
+          ${!t.auto ? `<label class="row small"><input type="checkbox" data-a="hwtick" data-k="${t.id}" ${d?"checked":""}> I did it</label>` : d ? `<span class="badge good">Done</span>` : `<span class="small muted">Checks itself when you finish.</span>`}</div>
+        <button class="btn" data-a="hwgo" data-k="${t.go}">Go</button></div>`;}).join("")}</div>
+    ${n===all ? `<p class="fb ok">All done. Nice work.</p>` : ""}
+  </section>`;
+}
+
 /* Placement test: 3 stages that get harder. audio:true = listen only, the Spanish is hidden until the end. */
 const PT = [
   // Stage 1 · basics
@@ -678,7 +705,8 @@ function viewHome(){
     <p class="muted" style="font-size:19px;max-width:36ch">Listen, try it, and see your progress. It’s okay to make mistakes.</p>
     <div class="row"><button class="btn primary big" data-a="startlesson">${started && !p.finishedAt ? "Continue lesson 1" : p.finishedAt ? "Do lesson 1 again" : "Start lesson 1"} →</button></div>
   </section>
-  <section class="card item" style="margin-top:20px">
+  ${homeworkCard()}
+  <section class="card item" style="margin-top:14px">
     <div class="stack-sm"><h3>Placement test</h3><p class="small muted">10–15 minutes, with your tutor. Shows where to start. Not a grade.</p>${DB.placement ? `<span class="badge good">Done: ${esc(DB.placement.band)}</span>` : `<span class="badge">Not taken yet</span>`}</div>
     <a class="btn" href="#placement" data-nav="placement">${DB.placement ? "See result" : "Take the test"}</a>
   </section>
@@ -1278,6 +1306,7 @@ function viewProgress(){
 function summaryText(){
   const L = lesson(), p = prog(), sc = k=>{const r=lastRun(k); return r?`${scoreOf(r).c}/${scoreOf(r).n}`:"not done";};
   return [`Clases de Español — Lesson 1 (${L.title})`, ptSummary(),
+    `${HOMEWORK.title}: ${HOMEWORK.tasks.filter(hwDone).length}/${HOMEWORK.tasks.length} done (${HOMEWORK.tasks.filter(t=>!hwDone(t)).map(t=>t.text).join("; ") || "all done"} pending)`,
     `Words practiced: ${p.wordsSeen.length}/${L.words.length}`,
     `Still learning: ${p.wordsHard.join(", ") || "none"}`,
     `Sentences said aloud: ${p.phrasesDone.length}/${L.phrases.length}`,
@@ -1389,6 +1418,11 @@ document.addEventListener("click", e=>{
       const fallback = ()=>{ box.hidden = false; box.value = t; box.focus(); box.select(); toast("Select the text below and copy it."); };
       try{ navigator.clipboard.writeText(t).then(()=>toast("Copied. Paste it in a message to your tutor."), fallback); }catch(err){ fallback(); }
       break; }
+    case "hwgo": { const k = el.dataset.k;
+      if(k==="lesson"){ ui.w = {i:0, phase:0}; ui.gram = "learn"; ui.ph = 0; ui.run = null; ui.checkStarted = false; go("lesson"); }
+      else if(k==="talk" || k==="sounds"){ go("listen"); ui.lsTab = k; if(k==="sounds") ui.sound = "r"; render(); }
+      else go(k);
+      break; }
     case "gosounds": go("listen"); ui.lsTab = "sounds"; render(); break;
     case "compstart": { const d = el.dataset.k==="read" ? L.reading : L.listening;
       ui.comp = {kind:el.dataset.k, answers:{}, plays:0, showT:false, orders:d.qs.map(q=>shuffle([q.ok].concat(q.others)))}; render(); window.scrollTo(0,0); break; }
@@ -1459,6 +1493,7 @@ document.addEventListener("input", e=>{
 });
 document.addEventListener("change", e=>{
   const el = e.target;
+  if(el.dataset && el.dataset.a==="hwtick"){ const p = prog(); p.hw = p.hw || {}; p.hw[el.dataset.k] = el.checked; save(); render(); }
   if(el.dataset && el.dataset.a==="pread"){ prog().project.read = el.checked; save(); }
   if(el.dataset && el.dataset.a==="voice"){ DB.voice = el.value; save(); Voice.speak("Hola", 1); }
 });
