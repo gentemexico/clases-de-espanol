@@ -165,7 +165,7 @@ select{font:inherit;font-size:16px;padding:8px 10px;border-radius:10px;border:1.
   </header>
   <main class="wrap" id="main" tabindex="-1"></main>
   <footer class="wrap">
-    <p>Clases de Español · Your progress is saved only in this browser, on this device.</p>
+    <p>Clases de Español · Your progress is saved only in this browser, on this device. <a href="#guide" data-nav="guide">How to use this site</a></p>
   </footer>
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
@@ -696,10 +696,55 @@ function helpBox(text){
     ${ui.help ? `<p class="tip">${text}</p>` : ""}</div>`;
 }
 
+const GUIDE_MENU = [
+  ["Home","Start here. Your homework, the placement test and Lesson 1."],
+  ["My lessons","Your lessons and Lesson notes, a page with all the words, rules and sentences."],
+  ["Words","Review flashcards. Try to remember the Spanish before you check."],
+  ["Practice","Short sets of questions, plus reading and listening."],
+  ["Listen & speak","Hear and say words and sentences. Sound lab and Conversation are here."],
+  ["My progress","What you’ve done, your results, and a summary to send your tutor."]
+];
+const GUIDE_BUTTONS = [
+  ["🔊 Listen","Plays the Spanish audio."],
+  ["Play slowly","Plays it slower so you can hear each part."],
+  ["Show meaning","Shows the English meaning."],
+  ["I need help","Gives a hint. It’s always okay to use it."],
+  ["Try again","Lets you answer again. Only your first answer counts."],
+  ["↻ Repeat after me","Plays it 3 times, from slow to normal, with a pause for you to repeat."],
+  ["🎙 Check my words","Listens to you and shows which words it understood. Not available on every device."]
+];
+function guideBody(){
+  return `<div class="stack">
+    <div class="stack-sm"><h3>Your first day</h3>
+      <ol class="cando"><li><strong>Placement test</strong> with your tutor (10–15 min).</li><li><strong>Start lesson 1</strong> (about 20 min).</li><li><strong>Homework</strong>: short tasks before your next class.</li></ol></div>
+    <div class="stack-sm"><h3>The menu</h3>
+      ${GUIDE_MENU.map(([n,d])=>`<div class="stat"><span><strong>${n}</strong></span><span class="small muted" style="text-align:right;max-width:60%">${d}</span></div>`).join("")}
+      <p class="small muted">On a phone, swipe the menu sideways to see all of it.</p></div>
+    <div class="stack-sm"><h3>The buttons</h3>
+      ${GUIDE_BUTTONS.map(([n,d])=>`<div class="stat"><span><strong>${n}</strong></span><span class="small muted" style="text-align:right;max-width:60%">${d}</span></div>`).join("")}</div>
+    <div class="stack-sm"><h3>Good to know</h3>
+      <ul class="cando">
+        <li>Turn your sound on. Headphones help.</li>
+        <li>Everything is explained in English. You don’t need to read Spanish to start.</li>
+        <li>Mistakes are part of learning. Nothing here is a grade.</li>
+        <li>Use the same phone or computer and the same browser each time. Your progress is saved there.</li>
+        <li>You can stop anytime and continue later.</li>
+      </ul></div>
+  </div>`;
+}
+function viewGuide(){
+  return `<div class="stack"><span class="eyebrow">Guide</span><h2>How to use this site</h2>${guideBody()}
+    <div class="row"><button class="btn primary big" data-a="guidedone">Got it, take me home</button></div></div>`;
+}
 function viewHome(){
   const p = prog(), L = lesson();
   const started = p.wordsSeen.length || p.runs.length || p.step>0;
-  return `<section class="hero stack">
+  const guide = !DB.guideSeen
+    ? `<section class="card stack" style="border-color:var(--primary)">
+        <span class="eyebrow">Welcome</span><h2>New here? Here’s how it works</h2>${guideBody()}
+        <div class="row"><button class="btn primary" data-a="guidedone">Got it</button></div></section>`
+    : `<div class="row" style="justify-content:flex-end"><a class="btn ghost" href="#guide" data-nav="guide">How to use this site</a></div>`;
+  return `${guide}<section class="hero stack">
     <p class="eyebrow">Lesson 1 · ${esc(L.titleEn)}</p>
     <h1>Your Spanish starts here</h1>
     <p class="muted" style="font-size:19px;max-width:36ch">Listen, try it, and see your progress. It’s okay to make mistakes.</p>
@@ -1320,8 +1365,8 @@ function summaryText(){
 }
 
 /* ============ RENDER + ROUTER ============ */
-const VIEWS = {home:viewHome, lesson:viewLesson, lessons:viewLessons, words:viewWords, practice:viewPractice, listen:viewListen, progress:viewProgress, notes:viewNotes, placement:viewPlacement, project:()=>`<div class="stack">${stepProject(true)}</div>`};
-const NAV_OF = {lesson:"home", project:"progress", notes:"lessons", placement:"home"};
+const VIEWS = {home:viewHome, lesson:viewLesson, lessons:viewLessons, words:viewWords, practice:viewPractice, listen:viewListen, progress:viewProgress, guide:viewGuide, notes:viewNotes, placement:viewPlacement, project:()=>`<div class="stack">${stepProject(true)}</div>`};
+const NAV_OF = {guide:"home", lesson:"home", project:"progress", notes:"lessons", placement:"home"};
 function render(keepFocus){
   const main = $("#main");
   const active = document.activeElement;
@@ -1423,6 +1468,7 @@ document.addEventListener("click", e=>{
       else if(k==="talk" || k==="sounds"){ go("listen"); ui.lsTab = k; if(k==="sounds") ui.sound = "r"; render(); }
       else go(k);
       break; }
+    case "guidedone": DB.guideSeen = true; save(); go("home"); break;
     case "gosounds": go("listen"); ui.lsTab = "sounds"; render(); break;
     case "compstart": { const d = el.dataset.k==="read" ? L.reading : L.listening;
       ui.comp = {kind:el.dataset.k, answers:{}, plays:0, showT:false, orders:d.qs.map(q=>shuffle([q.ok].concat(q.others)))}; render(); window.scrollTo(0,0); break; }
