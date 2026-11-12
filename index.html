@@ -1544,7 +1544,7 @@ function render(keepFocus){
   const main = $("#main");
   const active = document.activeElement;
   const fid = keepFocus && active && active.id;
-  main.innerHTML = (VIEWS[ui.view] || viewHome)();
+  main.innerHTML = (/github\.io$/.test(location.hostname) || location.protocol==="file:" ? "" : `<p class="banner" style="margin-bottom:16px"><strong>This site has moved.</strong> Please use the new link from now on: <a href="https://gentemexico.github.io/clases-de-espanol/" target="_blank" rel="noopener">gentemexico.github.io/clases-de-espanol</a></p>`) + (VIEWS[ui.view] || viewHome)();
   document.querySelectorAll(".nav a").forEach(a=>a.setAttribute("aria-current", a.dataset.nav===(NAV_OF[ui.view]||ui.view) ? "page" : "false"));
   if(fid){ const el = document.getElementById(fid); if(el){ el.focus(); if(el.setSelectionRange && el.value!=null) el.setSelectionRange(el.value.length, el.value.length); } }
 }
