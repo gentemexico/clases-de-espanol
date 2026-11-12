@@ -557,7 +557,7 @@ const Log = {
   }
 };
 function snapshot(){
-  const out = {cur:DB.current, pt: DB.placement ? {band:DB.placement.band, parts:DB.placement.parts, skills:DB.placement.skills, idk:DB.placement.idk, miss:DB.placement.miss, speak:DB.placement.speak} : null, hw:{}, lessons:{}};
+  const out = {warm:DB.warmDone||{}, recall:DB.recall||{}, cur:DB.current, pt: DB.placement ? {band:DB.placement.band, parts:DB.placement.parts, skills:DB.placement.skills, idk:DB.placement.idk, miss:DB.placement.miss, speak:DB.placement.speak} : null, hw:{}, lessons:{}};
   try{ HOMEWORK.tasks.forEach(t=>out.hw[t.id] = hwDone(t)); }catch(e){}
   LESSONS.forEach(L=>{ const q = DB.lessons[L.id]; if(!q) return;
     out.lessons[L.id] = {step:q.step, fin:!!(q.finishedAt||q.everFinished), words:q.wordsSeen.length, hard:q.wordsHard, phr:q.phrasesDone.length, conf:[q.confStart,q.confEnd],
@@ -802,7 +802,7 @@ function finishRun(run){
   prog().runs.push({kind:run.kind, at:Date.now(), items:run.items.map(it=>({id:it.id, chosen:it.first, correct:it.first===exById(it.id).ok, help:it.help>0 || it.meaning}))});
   save();
 }
-const KIND_NAME = {practice:"Practice set", diag:"Starting check", check:"Final check", mistakes:"Review your mistakes"};
+const KIND_NAME = {practice:"Practice set", diag:"Starting check", check:"Final check", mistakes:"Review your mistakes", warmup:"Warm-up"};
 /* Exercises whose most recent first answer was wrong or needed help (current lesson). */
 function mistakeIds(id){
   const last = {};
@@ -892,7 +892,7 @@ const GUIDE_BUTTONS = [
 function guideBody(){
   return `<div class="stack">
     <div class="stack-sm"><h3>Your first day</h3>
-      <ol class="cando"><li><strong>Placement test</strong> with your tutor (10–15 min).</li><li><strong>Start your lesson</strong> (about 20 min).</li><li><strong>Homework</strong>: short tasks before your next class.</li></ol></div>
+      <ol class="cando"><li><strong>Placement test</strong> with your tutor (10–15 min).</li><li><strong>Warm-up</strong> from Class 2 on: a 3-minute quiz on what you learned last class.</li><li><strong>Start your lesson</strong> (about 20 min).</li><li><strong>Homework</strong>: short tasks before your next class.</li></ol></div>
     <div class="stack-sm"><h3>The menu</h3>
       ${GUIDE_MENU.map(([n,d])=>`<div class="stat"><span><strong>${n}</strong></span><span class="small muted" style="text-align:right;max-width:60%">${d}</span></div>`).join("")}
       <p class="small muted">On a phone, swipe the menu sideways to see all of it.</p></div>
@@ -925,6 +925,7 @@ function viewHome(){
     <p class="eyebrow">Lesson ${L.num} · ${esc(L.titleEn)}</p>
     <h1>Your Spanish starts here</h1>
     <p class="muted" style="font-size:19px;max-width:36ch">Listen, try it, and see your progress. It’s okay to make mistakes.</p>
+    ${prevLesson(L) && !(DB.warmDone||{})[L.id] ? `<div class="card stack-sm" style="border-color:var(--primary)"><span class="eyebrow">Start here</span><h3>Warm-up: what you remember from Class ${prevLesson(L).num}</h3><p class="small muted">${8} quick questions and one sentence to say. About 3 minutes. It helps today’s class stick.</p><div class="row"><button class="btn primary" data-a="rcstart">Start the warm-up →</button></div></div>` : prevLesson(L) ? `<p class="small muted">Warm-up done ✓ · <button class="btn ghost" data-a="rcstart">Do it again</button></p>` : ""}
     <div class="row"><button class="btn primary big" data-a="startlesson">${started && !p.finishedAt ? "Continue lesson "+L.num : p.finishedAt ? "Do lesson "+L.num+" again" : "Start lesson "+L.num} →</button></div>
     ${L.num>1 && !prog(LESSONS[L.num-2].id).finishedAt ? `<p class="note">Lesson ${L.num-1} isn’t finished yet. It’s best to finish it first. <button class="btn ghost" data-a="startlesson" data-l="${LESSONS[L.num-2].id}">Go to lesson ${L.num-1}</button></p>` : ""}
   </section>
@@ -1318,7 +1319,8 @@ function viewReview(){
     ["read","Reading: "+L.reading.title,"Short text and 3 questions.", p.comp&&p.comp.read ? `${p.comp.read.right} of ${p.comp.read.total}` : "Not done yet"],
     ["listen","Listening: "+L.listening.title,"Listen first, then answer.", p.comp&&p.comp.listen ? `${p.comp.listen.right} of ${p.comp.listen.total}` : "Not done yet"],
     ["talk","Conversation","Answer "+talkList().length+" questions out loud.", `${(p.talked||[]).length} of ${talkList().length} answered`],
-    ["check","Final check","No hints. Shows what you can do on your own.", r("check")]
+    ["check","Final check","No hints. Shows what you can do on your own.", r("check")],
+    ["quiz","Memory quiz","8 mixed questions from this class, like the warm-up.", recallHistory(L.id).length ? `Last: ${recallHistory(L.id).slice(-1)[0].c} of ${recallHistory(L.id).slice(-1)[0].n}` : "Not done yet"]
   ];
   return `<div class="stack">
     <button class="btn ghost" data-nav="lessons" style="align-self:flex-start">← My classes</button>
@@ -1333,6 +1335,76 @@ function viewReview(){
       <div class="row"><button class="btn primary" data-a="revgo" data-k="mistakes">Practice these again</button></div></div>` : `<p class="note">No mistakes saved for this class yet. Do the practice set or the final check to see them here.</p>`}
     <div class="list">${items.map(([k,t,d,st])=>`<div class="card item"><div class="stack-sm"><h3>${esc(t)}</h3><p class="small muted">${esc(d)}</p>${st?`<span class="badge">${esc(st)}</span>`:""}</div><button class="btn" data-a="revgo" data-k="${k}">Open</button></div>`).join("")}</div>
     ${projectText() ? `<div class="card stack-sm"><h3>Your mini project</h3><p class="es-md" lang="es" style="font-size:20px">${esc(projectText())}</p><div class="row"><button class="btn" data-a="say" data-t="${esc(projectText())}">🔊 Listen</button><button class="btn" data-a="revgo" data-k="project">Edit</button></div></div>` : ""}
+  </div>`;
+}
+/* ============ WARM-UP QUIZ: what you learned last class ============ */
+function prevLesson(L){ L = L || lesson(); return L.num>1 ? LESSONS[L.num-2] : null; }
+function buildRecall(P){
+  const words = shuffle(P.words), items = [];
+  const others = w=>shuffle(P.words.filter(x=>x.en!==w.en)).slice(0,2).map(x=>x.en);
+  words.slice(0,3).forEach(w=>items.push({type:"word", es:w.es, ok:w.en, opts:shuffle([w.en].concat(others(w))), why:`${w.es} = ${w.en}. ${w.tip}`}));
+  words.slice(3,5).forEach(w=>items.push({type:"listen", es:w.es, ok:w.en, opts:shuffle([w.en].concat(others(w))), why:`You heard “${w.es}” = ${w.en}.`}));
+  shuffle(P.exercises).slice(0,3).forEach(e=>items.push({type:"gram", id:e.id, es:e.es, en:e.en.replace("___", e.verb), ok:e.ok, opts:shuffle([e.ok].concat(e.others)), why:e.why || (WHO[e.who]||{}).why || ""}));
+  const ph = shuffle(P.phrases)[0];
+  return {lid:P.id, items, i:0, answers:{}, speak:{es:ph.es, en:ph.en, guide:ph.guide, said:null}, done:false, started:Date.now()};
+}
+function recallHistory(lid){ return ((DB.recall||{})[lid]||[]); }
+function viewRecall(){
+  const R = ui.recall; if(!R) return viewHome();
+  const P = LESSONS.find(x=>x.id===R.lid), L = lesson();
+  if(R.done) return recallResult(R, P);
+  if(R.i>=R.items.length){
+    const sp = R.speak;
+    return `<div class="stack">
+      <span class="eyebrow">Warm-up · Class ${P.num} review · Last part</span>
+      <h2>Say it out loud</h2>
+      <p class="muted">Listen, then say this sentence from last class. Say it as many times as you like.</p>
+      <div class="card stack"><p class="es-md" lang="es">${esc(sp.es)}</p><p>${esc(sp.en)}</p><span class="guide">${sp.guide}</span>
+        <div class="row"><button class="btn primary" data-a="say" data-t="${esc(sp.es)}">🔊 Listen</button><button class="btn" data-a="say" data-t="${esc(sp.es)}" data-r="0.6">Play slowly</button></div>
+        ${checkRow("recall-speak", sp.es)}</div>
+      <div class="card stack-sm"><h3>How did it go?</h3>
+        <div class="conf">${[["easy","Easy"],["ok","With some effort"],["hard","Hard"]].map(([k,n])=>`<button class="chip ${sp.said===k?"on":""}" data-a="rcsay" data-v="${k}" aria-pressed="${sp.said===k}">${n}</button>`).join("")}</div></div>
+      <div class="row"><button class="btn primary big" data-a="rcfinish" ${sp.said?"":"disabled"}>See my result →</button></div>
+    </div>`;
+  }
+  const x = R.items[R.i], a = R.answers[R.i];
+  const prompt = x.type==="word" ? "What does this word mean?" : x.type==="listen" ? "Listen. What does it mean?" : "Choose the word that completes the sentence.";
+  return `<div class="stack">
+    <div class="stepbar"><span class="eyebrow">Warm-up · Class ${P.num} review · Question ${R.i+1} of ${R.items.length}</span>
+      <div class="steps" style="grid-template-columns:repeat(${R.items.length},1fr)" aria-hidden="true">${R.items.map((_,j)=>`<i class="${j<R.i?"done":j===R.i?"now":""}"></i>`).join("")}</div></div>
+    <div class="card stack">
+      <h3>${prompt}</h3>
+      ${x.type==="listen" ? `<div class="row"><button class="btn primary" data-a="say" data-t="${esc(x.es)}">🔊 Play</button><button class="btn" data-a="say" data-t="${esc(x.es)}" data-r="0.6">Play slowly</button></div>${a!=null?`<p class="es-md" lang="es">${esc(x.es)}</p>`:""}`
+        : x.type==="word" ? `<p class="es" lang="es">${esc(x.es)}</p><div class="row"><button class="btn ghost" data-a="say" data-t="${esc(x.es)}">🔊 Listen</button></div>`
+        : `<p class="sentence" lang="es">${blankify(x.es)}</p><p class="muted">Meaning: ${esc(x.en)}</p>`}
+      <div class="opts">${x.opts.map(o=>`<button class="opt ${a!=null && o===x.ok ? "right" : a===o ? "wrong" : ""}" ${x.type==="gram"?'lang="es"':''} data-a="rcans" data-o="${esc(o)}" ${a!=null?"disabled":""}>${esc(o)}</button>`).join("")}</div>
+      ${a!=null ? `<div class="fb ${a===x.ok?"ok":"no"}"><strong>${a===x.ok?"You remembered!":"Not this time. Here’s the answer."}</strong>${x.type==="gram" ? `<span lang="es">${esc(fill(x.es, x.ok))}</span>. `:""}${esc(x.why)}</div>
+        <div class="row"><button class="btn primary big" data-a="rcnext">Next →</button></div>` : ""}
+    </div>
+    ${R.free ? `<div class="row"><button class="btn ghost" data-a="reviewfor" data-l="${R.lid}">Stop the quiz</button></div>` : `<div class="row"><button class="btn ghost" data-a="rcskip">Skip the warm-up for now</button></div>`}
+  </div>`;
+}
+function recallResult(R, P){
+  const n = R.items.length, c = R.items.filter((x,i)=>R.answers[i]===x.ok).length;
+  const hist = recallHistory(P.id), prevQuiz = hist.length>1 ? hist[hist.length-2] : null;
+  const lastCheck = (()=>{ const rs = prog(P.id).runs.filter(r=>r.kind==="check"||r.kind==="practice"); const r = rs[rs.length-1]; return r ? scoreOf(r) : null; })();
+  const remembered = R.items.filter((x,i)=>R.answers[i]===x.ok && x.type!=="gram").map(x=>x.es);
+  const missed = R.items.filter((x,i)=>R.answers[i]!==x.ok);
+  const pct = v=>Math.round(v*100);
+  let growth = "";
+  if(prevQuiz) growth = `Last warm-up: ${prevQuiz.c} of ${prevQuiz.n}. Today: ${c} of ${n}.`;
+  else if(lastCheck) growth = `In Class ${P.num} you got ${lastCheck.c} of ${lastCheck.n} on your own. Today, days later, you remembered ${pct(c/n)}%.`;
+  const msg = c===n ? "Everything stuck. That’s real learning." : c>=n*0.75 ? "Most of it stuck. Nice work." : c>=n*0.5 ? "You kept a good part of it. Today’s class builds on it." : "This is normal after a few days. A quick review now makes it stick.";
+  return `<div class="stack">
+    <span class="eyebrow">${R.free?"Memory quiz":"Warm-up"} · Class ${P.num} review</span>
+    <p class="celebrate">You remembered ${c} of ${n}.</p>
+    <p style="font-size:18px">${esc(msg)}</p>
+    ${growth ? `<div class="card stack-sm"><h3>Your progress</h3><p>${esc(growth)}</p></div>` : ""}
+    ${remembered.length ? `<div class="card stack-sm"><h3>Words you still know</h3><p lang="es" class="es-md" style="font-size:20px">${remembered.map(esc).join(" · ")}</p></div>` : ""}
+    ${missed.length ? `<div class="card stack-sm"><h3>Quick review</h3>${missed.map(x=>`<div class="stat"><span lang="es">${esc(x.type==="gram" ? fill(x.es,x.ok) : x.es)} <span class="muted" lang="en">${x.type==="gram"?"":"= "+esc(x.ok)}</span></span><button class="btn ghost" data-a="say" data-t="${esc(x.type==="gram"?fill(x.es,x.ok):x.es)}" aria-label="Listen">🔊</button></div>`).join("")}
+      <p class="small muted">These are saved in Review this class › Your mistakes, so you can practice them again.</p></div>` : ""}
+    <p class="small muted">This shows what you remember today. It isn’t a grade.</p>
+    <div class="row">${R.free ? `<button class="btn primary big" data-a="reviewfor" data-l="${P.id}">Back to Class ${P.num} review</button>` : `<button class="btn primary big" data-a="rcgo">Start lesson ${lesson().num} →</button><button class="btn ghost" data-a="reviewfor" data-l="${P.id}">Review Class ${P.num}</button>`}</div>
   </div>`;
 }
 function viewLessons(){
@@ -1565,6 +1637,7 @@ function summaryText(){
   const L = lesson(), p = prog(), sc = k=>{const r=lastRun(k); return r?`${scoreOf(r).c}/${scoreOf(r).n}`:"not done";};
   const others = LESSONS.filter(x=>x.id!==L.id).map(x=>{const q = prog(x.id); return `Lesson ${x.num}: ${q.finishedAt?"finished":q.wordsSeen.length||q.step?"in progress (step "+(q.step+1)+"/5)":"not started"}`;});
   return [`Clases de Español — Lesson ${L.num} (${L.title})`, ...others, ptSummary(),
+    `Warm-ups: ${Object.entries(DB.recall||{}).map(([k,v])=>`Class ${(LESSONS.find(x=>x.id===k)||{}).num} ${v.map(r=>r.c+"/"+r.n).join(", ")}`).join("; ") || "none yet"}`,
     `${HOMEWORK.title}: ${HOMEWORK.tasks.filter(hwDone).length}/${HOMEWORK.tasks.length} done (${HOMEWORK.tasks.filter(t=>!hwDone(t)).map(t=>t.text).join("; ") || "all done"} pending)`,
     `Words practiced: ${p.wordsSeen.length}/${L.words.length}`,
     `Still learning: ${p.wordsHard.join(", ") || "none"}`,
@@ -1579,8 +1652,8 @@ function summaryText(){
 }
 
 /* ============ RENDER + ROUTER ============ */
-const VIEWS = {home:viewHome, lesson:viewLesson, lessons:viewLessons, words:viewWords, practice:viewPractice, listen:viewListen, progress:viewProgress, guide:viewGuide, review:viewReview, notes:viewNotes, placement:viewPlacement, project:()=>`<div class="stack">${stepProject(true)}</div>`};
-const NAV_OF = {guide:"home", lesson:"home", project:"progress", notes:"lessons", review:"lessons", placement:"home"};
+const VIEWS = {home:viewHome, lesson:viewLesson, lessons:viewLessons, words:viewWords, practice:viewPractice, listen:viewListen, progress:viewProgress, guide:viewGuide, review:viewReview, recall:viewRecall, notes:viewNotes, placement:viewPlacement, project:()=>`<div class="stack">${stepProject(true)}</div>`};
+const NAV_OF = {guide:"home", lesson:"home", project:"progress", notes:"lessons", review:"lessons", recall:"home", placement:"home"};
 function render(keepFocus){
   const main = $("#main");
   const active = document.activeElement;
@@ -1616,7 +1689,8 @@ document.addEventListener("click", e=>{
     case "notesfor": DB.current = el.dataset.l; save(); go("notes"); break;
     case "reviewfor": DB.current = el.dataset.l; save(); Log.ev("review_open", {lesson:el.dataset.l}); go("review"); break;
     case "revgo": { const k = el.dataset.k; Log.ev("review_go", {lesson:DB.current, k});
-      if(k==="notes" || k==="words" || k==="project") go(k);
+      if(k==="quiz"){ ui.recall = Object.assign(buildRecall(L), {free:true}); go("recall"); }
+      else if(k==="notes" || k==="words" || k==="project") go(k);
       else if(k==="lesson"){ const q = prog(); ui.w = {i:0, phase:0}; ui.gram = "learn"; ui.ph = 0; ui.run = null; ui.checkStarted = false; if(q.finishedAt){ DB.lessons[DB.current] = Object.assign(blankLesson(), {confStart:q.confStart, runs:q.runs, everFinished:q.finishedAt||q.everFinished, comp:q.comp, sounds:q.sounds, talked:q.talked, project:q.project}); save(); } go("lesson"); }
       else if(k==="read" || k==="listen"){ go("practice"); const d = k==="read" ? L.reading : L.listening; ui.comp = {kind:k, answers:{}, plays:0, showT:false, orders:d.qs.map(q=>shuffle([q.ok].concat(q.others)))}; render(); }
       else if(k==="talk"){ go("listen"); ui.lsTab = "talk"; ui.talk = {i:0, phase:0}; render(); }
@@ -1624,6 +1698,8 @@ document.addEventListener("click", e=>{
       break; }
     case "pickl": DB.current = el.dataset.l; save(); render(); break;
     case "startlesson":
+      { const target = LESSONS.find(x=>x.id===(el.dataset.l||DB.current)); const P = prevLesson(target);
+        if(P && !(DB.warmDone||{})[target.id] && !ui.skipWarm){ DB.current = target.id; save(); ui.recall = buildRecall(P); Log.ev("warmup_start", {of:P.id}); go("recall"); break; } }
       if(el.dataset.l && el.dataset.l!==DB.current){ DB.current = el.dataset.l; save(); const q = prog(); if(q.finishedAt){ const keep = {confStart:q.confStart, runs:q.runs, everFinished:q.finishedAt||q.everFinished, comp:q.comp, sounds:q.sounds, talked:q.talked, project:q.project, hw:q.hw}; DB.lessons[DB.current] = Object.assign(blankLesson(), keep); save(); } ui.w = {i:0, phase:0}; ui.gram = "learn"; ui.ph = 0; ui.run = null; ui.checkStarted = false; go("lesson"); break; }
       if(p.finishedAt){ const keep = {confStart:p.confStart, runs:p.runs, everFinished:p.finishedAt||p.everFinished, comp:p.comp, sounds:p.sounds, talked:p.talked, project:p.project, hw:p.hw}; DB.lessons[DB.current] = Object.assign(blankLesson(), keep); save(); }
       ui.w = {i:0, phase:0}; ui.gram = "learn"; ui.ph = 0; ui.run = null; ui.checkStarted = false;
@@ -1696,6 +1772,21 @@ document.addEventListener("click", e=>{
       else { save(); go(k); }
       break; }
     case "guidedone": DB.guideSeen = true; save(); go("home"); break;
+    case "rcstart": { const P = prevLesson(); if(!P) break; ui.recall = buildRecall(P); Log.ev("warmup_start", {of:P.id}); go("recall"); break; }
+    case "rcans": { const R = ui.recall; if(R.answers[R.i]!=null) break; const x = R.items[R.i]; R.answers[R.i] = el.dataset.o;
+      Log.ev("warmup_answer", {of:R.lid, type:x.type, q:x.es, chosen:el.dataset.o, ok:el.dataset.o===x.ok});
+      if(x.type==="gram" && el.dataset.o!==x.ok){ const q = prog(R.lid); q.runs.push({kind:"warmup", at:Date.now(), items:[{id:x.id, chosen:el.dataset.o, correct:false, help:false}]}); save(); }
+      if(x.type==="gram" && el.dataset.o===x.ok){ const q = prog(R.lid); q.runs.push({kind:"warmup", at:Date.now(), items:[{id:x.id, chosen:el.dataset.o, correct:true, help:false}]}); save(); }
+      render(); break; }
+    case "rcnext": stopMedia(); ui.recall.i++; render(); window.scrollTo(0,0); break;
+    case "rcsay": ui.recall.speak.said = el.dataset.v; render(); break;
+    case "rcfinish": { const R = ui.recall, n = R.items.length, c = R.items.filter((x,i)=>R.answers[i]===x.ok).length;
+      DB.recall = DB.recall || {}; (DB.recall[R.lid] = DB.recall[R.lid] || []).push({at:Date.now(), c, n, speak:R.speak.said});
+      if(!R.free){ DB.warmDone = DB.warmDone || {}; DB.warmDone[DB.current] = Date.now(); } R.done = true; save();
+      Log.ev("warmup_done", {of:R.lid, score:c+"/"+n, speak:R.speak.said, missed:R.items.filter((x,i)=>R.answers[i]!==x.ok).map(x=>x.es)});
+      render(); window.scrollTo(0,0); break; }
+    case "rcskip": Log.ev("warmup_skip", {of:ui.recall && ui.recall.lid}); ui.skipWarm = true; ui.recall = null; go("home"); break;
+    case "rcgo": { ui.skipWarm = true; const q = prog(); ui.w = {i:0, phase:0}; ui.gram = "learn"; ui.ph = 0; ui.run = null; ui.checkStarted = false; if(q.finishedAt){ DB.lessons[DB.current] = Object.assign(blankLesson(), {confStart:q.confStart, runs:q.runs, everFinished:q.finishedAt||q.everFinished, comp:q.comp, sounds:q.sounds, talked:q.talked, project:q.project, hw:q.hw}); save(); } go("lesson"); break; }
     case "gosounds": go("listen"); ui.lsTab = "sounds"; render(); break;
     case "compstart": { const d = el.dataset.k==="read" ? L.reading : L.listening;
       ui.comp = {kind:el.dataset.k, answers:{}, plays:0, showT:false, orders:d.qs.map(q=>shuffle([q.ok].concat(q.others)))}; render(); window.scrollTo(0,0); break; }
