@@ -519,7 +519,11 @@ function flash(t){const el=document.getElementById("savestate"); el.textContent=
    Nothing is lost while offline or unconfigured: the queue keeps up to 800 events and sends them later.
    No audio, no contact details. */
 const LOG_CONFIG = { action:"https://docs.google.com/forms/d/e/1FAIpQLSefKJxF0H91jKNYdCtTtRFHp_4TdfUWfvk8C3N6GxqltUDcrA/formResponse", field:"entry.700777899" };   // Google Form "formResponse" URL and the entry id of its one paragraph question
-const STUDENT_CODE = "E01";
+/* Open the site once with ?tutor to mark that browser as the tutor's: its events are logged as TUTOR, not as the student. ?student undoes it. */
+const STUDENT_CODE = (()=>{ try{ const q = location.search;
+  if(/[?&]tutor\b/.test(q)) localStorage.setItem("clases-espanol.role","tutor");
+  if(/[?&]student\b/.test(q)) localStorage.removeItem("clases-espanol.role");
+  return localStorage.getItem("clases-espanol.role")==="tutor" ? "TUTOR" : "E01"; }catch(e){ return "E01"; } })();
 const LOG_KEY = "clases-espanol.log.v1";
 const Log = {
   q:[], dev:null, sess:null, t:null, sending:false,
