@@ -155,7 +155,7 @@ select{font:inherit;font-size:16px;padding:8px 10px;border-radius:10px;border:1.
       </div>
       <nav class="nav" aria-label="Main menu">
         <a href="#home" data-nav="home">Home</a>
-        <a href="#lessons" data-nav="lessons">My lessons</a>
+        <a href="#lessons" data-nav="lessons">My classes</a>
         <a href="#words" data-nav="words">Words</a>
         <a href="#practice" data-nav="practice">Practice</a>
         <a href="#listen" data-nav="listen">Listen &amp; speak</a>
@@ -174,7 +174,7 @@ select{font:inherit;font-size:16px;padding:8px 10px;border-radius:10px;border:1.
 "use strict";
 /* ============ CONTENT (lesson 1) ============ */
 const LESSONS = [{
-  id: "s01", num: 1,
+  id: "s01", num: 1, classDate: "Nov 10",
   canDo: "Pick the right verb for yo, tú, él and ella.",
   grammar: {
     title: "Who is doing it?",
@@ -259,7 +259,7 @@ const LESSONS = [{
 }];
 
 LESSONS.push({
-  id: "s02", num: 2,
+  id: "s02", num: 2, classDate: "Nov 12",
   title: "Todo sobre mí",
   titleEn: "All about me",
   goal: "Introduce yourself: your name, age, where you’re from, where you live and what you like.",
@@ -787,6 +787,7 @@ function bank(kind){
   const L = lesson();
   if(kind==="practice") return L.exercises.filter(e=>e.bank==="practice");
   if(kind==="diag") return L.exercises.filter(e=>e.bank==="diag");
+  if(kind==="mistakes"){ const ids = mistakeIds(); return L.exercises.filter(e=>ids.includes(e.id)); }
   return L.exercises.filter(e=>e.check).concat(L.exercises.filter(e=>e.bank==="transfer")); // final check
 }
 function newRun(kind, where){
@@ -801,7 +802,13 @@ function finishRun(run){
   prog().runs.push({kind:run.kind, at:Date.now(), items:run.items.map(it=>({id:it.id, chosen:it.first, correct:it.first===exById(it.id).ok, help:it.help>0 || it.meaning}))});
   save();
 }
-const KIND_NAME = {practice:"Practice set", diag:"Starting check", check:"Final check"};
+const KIND_NAME = {practice:"Practice set", diag:"Starting check", check:"Final check", mistakes:"Review your mistakes"};
+/* Exercises whose most recent first answer was wrong or needed help (current lesson). */
+function mistakeIds(id){
+  const last = {};
+  prog(id).runs.forEach(r=>r.items.forEach(x=>{ last[x.id] = x; }));
+  return Object.keys(last).filter(k=>!last[k].correct || last[k].help);
+}
 function scoreOf(r){ const c = r.items.filter(x=>x.correct && !x.help).length; return {c, n:r.items.length}; }
 function lastRun(kind){ const rs = prog().runs.filter(r=>r.kind===kind); return rs[rs.length-1] || null; }
 
@@ -811,7 +818,7 @@ function runView(run, opts){
   const answered = it.tries.length > 0;
   const lastTry = it.tries[it.tries.length-1];
   const isRight = lastTry === e.ok;
-  const hints = run.kind==="practice";
+  const hints = run.kind==="practice" || run.kind==="mistakes";
   let h = `<div class="stack">
     <div class="row" style="justify-content:space-between"><span class="eyebrow">Question ${run.i+1} of ${run.items.length}</span>${run.kind==="check" && e.bank==="transfer" ? '<span class="badge">New sentence</span>' : ''}</div>
     <p class="muted">Choose the word that completes the sentence.</p>
@@ -867,7 +874,7 @@ function helpBox(text){
 
 const GUIDE_MENU = [
   ["Home","Start here. Your homework, the placement test and your current lesson."],
-  ["My lessons","Your lessons and Lesson notes, a page with all the words, rules and sentences."],
+  ["My classes","Every class you’ve had. Tap Review this class to go over its words, exercises and your mistakes."],
   ["Words","Review flashcards. Try to remember the Spanish before you check."],
   ["Practice","Short sets of questions, plus reading and listening."],
   ["Listen & speak","Hear and say words and sentences. Sound lab and Conversation are here."],
@@ -1161,7 +1168,7 @@ function viewNotes(){
   const L = lesson();
   const sayBtn = (t,label)=>`<button class="btn ghost" data-a="say" data-t="${esc(t)}" aria-label="Listen to ${esc(t)}">🔊${label?" "+label:""}</button>`;
   return `<div class="stack">
-    <button class="btn ghost" data-nav="lessons" style="align-self:flex-start">← My lessons</button>
+    <button class="btn ghost" data-nav="lessons" style="align-self:flex-start">← My classes</button>
     <span class="eyebrow">Lesson ${L.num} · Lesson notes</span>
     <h2>${esc(L.titleEn)}</h2>
     <p class="muted"><span lang="es">${esc(L.title)}</span>. Goal: ${esc(L.goal)}</p>
@@ -1298,13 +1305,44 @@ function ptSummary(){
     `To work on: ${r.miss.join("; ") || "-"}`,
     `Speaking: ${Object.entries(r.speak).map(([k,v])=>`${k}=${v}`).join(", ") || "skipped"}`].join("\n");
 }
+function viewReview(){
+  const L = lesson(), p = prog();
+  const r = k=>{ const x = lastRun(k); return x ? `${scoreOf(x).c} of ${scoreOf(x).n}` : "Not done yet"; };
+  const miss = mistakeIds();
+  const missList = miss.map(id=>L.exercises.find(e=>e.id===id)).filter(Boolean);
+  const items = [
+    ["notes","Lesson notes","All the words, the rule, key sentences and questions on one page.",""],
+    ["words","Words","Flashcards for the "+L.words.length+" words of this class.", `${p.wordsSeen.length} of ${L.words.length} practiced`],
+    ["lesson","Redo the lesson","The 5 steps again: words, sentences, listening, mini project and check.", p.finishedAt||p.everFinished ? "Finished" : p.step ? `Step ${p.step+1} of 5` : "Not started"],
+    ["practice","Practice set","Sentences with help available.", r("practice")],
+    ["read","Reading: "+L.reading.title,"Short text and 3 questions.", p.comp&&p.comp.read ? `${p.comp.read.right} of ${p.comp.read.total}` : "Not done yet"],
+    ["listen","Listening: "+L.listening.title,"Listen first, then answer.", p.comp&&p.comp.listen ? `${p.comp.listen.right} of ${p.comp.listen.total}` : "Not done yet"],
+    ["talk","Conversation","Answer "+talkList().length+" questions out loud.", `${(p.talked||[]).length} of ${talkList().length} answered`],
+    ["check","Final check","No hints. Shows what you can do on your own.", r("check")]
+  ];
+  return `<div class="stack">
+    <button class="btn ghost" data-nav="lessons" style="align-self:flex-start">← My classes</button>
+    <span class="eyebrow">Class ${L.num} · ${esc(L.classDate||"")}</span>
+    <h2>${esc(L.titleEn)}</h2>
+    <p class="muted"><span lang="es">${esc(L.title)}</span>. ${esc(L.goal)}</p>
+    <div class="card stack-sm"><h3>What we covered</h3>
+      <p><strong>${esc(L.grammar.title)}:</strong> ${L.grammar.rows.map(([g,e])=>`<span lang="es">${esc(g)}</span> (${esc(e)})`).join(" · ")}</p>
+      <p class="small muted">Words: <span lang="es">${L.words.map(w=>esc(w.es)).join(" · ")}</span></p></div>
+    ${missList.length ? `<div class="card stack-sm" style="border-color:var(--accent)"><h3>Your mistakes to review</h3>
+      ${missList.map(e=>`<div class="stat"><span lang="es">${esc(fill(e.es, e.ok))}<br><span class="small muted" lang="en">${esc(e.why || (WHO[e.who]||{}).why || "")}</span></span><button class="btn ghost" data-a="say" data-t="${esc(fill(e.es,e.ok))}" aria-label="Listen">🔊</button></div>`).join("")}
+      <div class="row"><button class="btn primary" data-a="revgo" data-k="mistakes">Practice these again</button></div></div>` : `<p class="note">No mistakes saved for this class yet. Do the practice set or the final check to see them here.</p>`}
+    <div class="list">${items.map(([k,t,d,st])=>`<div class="card item"><div class="stack-sm"><h3>${esc(t)}</h3><p class="small muted">${esc(d)}</p>${st?`<span class="badge">${esc(st)}</span>`:""}</div><button class="btn" data-a="revgo" data-k="${k}">Open</button></div>`).join("")}</div>
+    ${projectText() ? `<div class="card stack-sm"><h3>Your mini project</h3><p class="es-md" lang="es" style="font-size:20px">${esc(projectText())}</p><div class="row"><button class="btn" data-a="say" data-t="${esc(projectText())}">🔊 Listen</button><button class="btn" data-a="revgo" data-k="project">Edit</button></div></div>` : ""}
+  </div>`;
+}
 function viewLessons(){
-  return `<div class="stack"><h2>My lessons</h2>
+  return `<div class="stack"><h2>My classes</h2>
+    <p class="muted">Every class with its lesson and exercises. Open Review to go back over a class.</p>
     ${LESSONS.map(L=>{const p=prog(L.id); return `<div class="card item">
-      <div class="stack-sm"><span class="eyebrow">Lesson ${L.num}${L.id===ASSIGNED?" · Current":""}</span><h3>${esc(L.titleEn)}</h3><p class="small muted" lang="es">${esc(L.title)}</p><p class="small">${esc(L.goal)}</p>
+      <div class="stack-sm"><span class="eyebrow">Class ${L.num}${L.classDate?" · "+esc(L.classDate):""}${L.id===ASSIGNED?" · Current":""}</span><h3>${esc(L.titleEn)}</h3><p class="small muted" lang="es">${esc(L.title)}</p><p class="small">${esc(L.goal)}</p>
       <p class="small muted">${p.finishedAt ? "Finished" : p.step>0 || p.wordsSeen.length ? `In progress · step ${p.step+1} of 5` : "Not started"}</p></div>
-      <div class="stack-sm"><button class="btn primary" data-a="startlesson" data-l="${L.id}">${p.finishedAt?"Do it again":p.step>0||p.wordsSeen.length?"Continue":"Start"} →</button><button class="btn" data-a="notesfor" data-l="${L.id}">Lesson notes</button></div></div>`;}).join("")}
-    <p class="note">More lessons will appear here when your tutor adds them.</p></div>`;
+      <div class="stack-sm"><button class="btn primary" data-a="startlesson" data-l="${L.id}">${p.finishedAt?"Do it again":p.step>0||p.wordsSeen.length?"Continue":"Start"} →</button><button class="btn" data-a="reviewfor" data-l="${L.id}">Review this class</button><button class="btn ghost" data-a="notesfor" data-l="${L.id}">Lesson notes</button></div></div>`;}).join("")}
+    <p class="note">A new class appears here after each session with your tutor.</p></div>`;
 }
 
 function viewWords(){
@@ -1369,8 +1407,11 @@ function viewPractice(){
   }
   const lp = lastRun("practice"), ld = lastRun("diag"), lc = lastRun("check");
   const res = r=> r ? `<span class="badge">Last: ${scoreOf(r).c} of ${scoreOf(r).n}</span>` : `<span class="badge">Not done yet</span>`;
+  const nm = mistakeIds().length;
   return `<div class="stack"><h2>Practice</h2>
-    <p class="muted">Short sets. You can stop anytime.</p>
+    <div class="row" role="group" aria-label="Which lesson">${LESSONS.map(x=>`<button class="chip ${x.id===DB.current?"on":""}" data-a="pickl" data-l="${x.id}" aria-pressed="${x.id===DB.current}">Lesson ${x.num}</button>`).join("")}</div>
+    <p class="muted">Lesson ${lesson().num} · ${esc(lesson().titleEn)}. Short sets. You can stop anytime.</p>
+    ${nm ? `<div class="card item" style="border-color:var(--accent)"><div class="stack-sm"><h3>Review your mistakes</h3><p class="small muted">${nm} ${nm===1?"sentence":"sentences"} you missed or needed help with. Help is available.</p></div><button class="btn primary" data-a="runstart" data-k="mistakes">Start</button></div>` : ""}
     <div class="card item"><div class="stack-sm"><h3>Practice set</h3><p class="small muted">${bank("practice").length} sentences with help available: Show meaning and I need help.</p>${res(lp)}</div><button class="btn primary" data-a="runstart" data-k="practice">Start</button></div>
     <div class="card item"><div class="stack-sm"><h3>Reading: ${esc(lesson().reading.title)}</h3><p class="small muted">A short text with word help and 3 questions in English.</p>${compRes("read")}</div><button class="btn" data-a="compstart" data-k="read">Start</button></div>
     <div class="card item"><div class="stack-sm"><h3>Listening: ${esc(lesson().listening.title)}</h3><p class="small muted">Listen without reading first, then answer 3 questions in English.</p>${compRes("listen")}</div><button class="btn" data-a="compstart" data-k="listen">Start</button></div>
@@ -1538,8 +1579,8 @@ function summaryText(){
 }
 
 /* ============ RENDER + ROUTER ============ */
-const VIEWS = {home:viewHome, lesson:viewLesson, lessons:viewLessons, words:viewWords, practice:viewPractice, listen:viewListen, progress:viewProgress, guide:viewGuide, notes:viewNotes, placement:viewPlacement, project:()=>`<div class="stack">${stepProject(true)}</div>`};
-const NAV_OF = {guide:"home", lesson:"home", project:"progress", notes:"lessons", placement:"home"};
+const VIEWS = {home:viewHome, lesson:viewLesson, lessons:viewLessons, words:viewWords, practice:viewPractice, listen:viewListen, progress:viewProgress, guide:viewGuide, review:viewReview, notes:viewNotes, placement:viewPlacement, project:()=>`<div class="stack">${stepProject(true)}</div>`};
+const NAV_OF = {guide:"home", lesson:"home", project:"progress", notes:"lessons", review:"lessons", placement:"home"};
 function render(keepFocus){
   const main = $("#main");
   const active = document.activeElement;
@@ -1573,10 +1614,18 @@ document.addEventListener("click", e=>{
   const a = el.dataset.a, p = prog(), L = lesson();
   switch(a){
     case "notesfor": DB.current = el.dataset.l; save(); go("notes"); break;
+    case "reviewfor": DB.current = el.dataset.l; save(); Log.ev("review_open", {lesson:el.dataset.l}); go("review"); break;
+    case "revgo": { const k = el.dataset.k; Log.ev("review_go", {lesson:DB.current, k});
+      if(k==="notes" || k==="words" || k==="project") go(k);
+      else if(k==="lesson"){ const q = prog(); ui.w = {i:0, phase:0}; ui.gram = "learn"; ui.ph = 0; ui.run = null; ui.checkStarted = false; if(q.finishedAt){ DB.lessons[DB.current] = Object.assign(blankLesson(), {confStart:q.confStart, runs:q.runs, everFinished:q.finishedAt||q.everFinished, comp:q.comp, sounds:q.sounds, talked:q.talked, project:q.project}); save(); } go("lesson"); }
+      else if(k==="read" || k==="listen"){ go("practice"); const d = k==="read" ? L.reading : L.listening; ui.comp = {kind:k, answers:{}, plays:0, showT:false, orders:d.qs.map(q=>shuffle([q.ok].concat(q.others)))}; render(); }
+      else if(k==="talk"){ go("listen"); ui.lsTab = "talk"; ui.talk = {i:0, phase:0}; render(); }
+      else { go("practice"); ui.run = newRun(k, "tab"); render(); }
+      break; }
     case "pickl": DB.current = el.dataset.l; save(); render(); break;
     case "startlesson":
-      if(el.dataset.l && el.dataset.l!==DB.current){ DB.current = el.dataset.l; save(); const q = prog(); if(q.finishedAt){ const keep = {confStart:q.confStart, runs:q.runs, everFinished:q.finishedAt||q.everFinished}; DB.lessons[DB.current] = Object.assign(blankLesson(), keep); save(); } ui.w = {i:0, phase:0}; ui.gram = "learn"; ui.ph = 0; ui.run = null; ui.checkStarted = false; go("lesson"); break; }
-      if(p.finishedAt){ const keep = {confStart:p.confStart, runs:p.runs, everFinished:p.finishedAt||p.everFinished}; DB.lessons[DB.current] = Object.assign(blankLesson(), keep); save(); }
+      if(el.dataset.l && el.dataset.l!==DB.current){ DB.current = el.dataset.l; save(); const q = prog(); if(q.finishedAt){ const keep = {confStart:q.confStart, runs:q.runs, everFinished:q.finishedAt||q.everFinished, comp:q.comp, sounds:q.sounds, talked:q.talked, project:q.project, hw:q.hw}; DB.lessons[DB.current] = Object.assign(blankLesson(), keep); save(); } ui.w = {i:0, phase:0}; ui.gram = "learn"; ui.ph = 0; ui.run = null; ui.checkStarted = false; go("lesson"); break; }
+      if(p.finishedAt){ const keep = {confStart:p.confStart, runs:p.runs, everFinished:p.finishedAt||p.everFinished, comp:p.comp, sounds:p.sounds, talked:p.talked, project:p.project, hw:p.hw}; DB.lessons[DB.current] = Object.assign(blankLesson(), keep); save(); }
       ui.w = {i:0, phase:0}; ui.gram = "learn"; ui.ph = 0; ui.run = null; ui.checkStarted = false;
       go("lesson"); break;
     case "conf": p[el.dataset.f] = +el.dataset.v; save(); Log.ev("confidence", {when:el.dataset.f, v:+el.dataset.v}); render(); break;
