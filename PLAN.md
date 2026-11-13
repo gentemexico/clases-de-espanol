@@ -26,3 +26,17 @@ Sitio: https://gentemexico.github.io/clases-de-espanol/ · Registro: hoja «Clas
 - Cambios al sitio (lección nueva, tarea nueva) los aprueba el tutor antes de publicarse.
 
 ## Bitácora de reportes
+
+### Reporte 13-nov-2026 (actividad del 12-nov, hora del Pacífico)
+- **Sesiones:** 1 sesión real, 16:45–17:38 (≈ 53 min). Además, una apertura a las 18:34 sin actividad. Las aperturas de 12:42–13:01 cerraron en menos de 1 s, cada una con un dispositivo nuevo: parecen cargas de prueba y no se cuentan.
+- **Warm-up (repaso de la Lección 1):** 8/8 sin errores (palabras, imagen, escucha, gramática -ar). Habló bien: «Tú escuchas música.» lo captó completo.
+- **Lección 2, paso 3:** set de práctica con 8/8 aciertos a primer intento, pero **3/8 sin ayuda**. Pidió ayuda o el significado en p1 (no me gusta), p3 (yo soy de), p5 (tú vives), p6 (¿cómo te llamas?) y p7 (ella es).
+- **Lectura y escucha:** entró a «Listen», pero no hay reproducciones registradas. No hizo conversación, prueba de oído, mini proyecto ni marcó palabras «Still learning».
+- **Examen de colocación:** no aparece. **Tarea (hw):** 0/7.
+- **Errores repetidos:** ninguno (cero primeros intentos fallidos). Patrón de ayuda: **ser** (soy/es, 2 veces) y **terminaciones de tú** (vives/llamas, 2 veces).
+- **«Check my words»:** en «Hola, me llamo Alex.» solo cambió «Alex» por su propio nombre. Eso es correcto, no es un error de pronunciación.
+- **Alerta técnica:** los eventos de la sesión llegaron sin dispositivo ni sesión (`dev`/`ses` nulos) y el último `snap` (18:34) muestra todo en cero (paso 0, sin sets). Puede ser otro navegador o un modo que no guarda. Hay que revisarlo antes de confiar en el `snap`.
+- **Ajustes propuestos para la clase 3 (los aprueba el tutor):**
+  1. Primero, el examen de colocación (sigue pendiente); el supuesto sigue en «principiante desde cero».
+  2. Refuerzo corto de ser (yo soy / tú eres / él-ella es) y de las terminaciones de tú (-as/-es) en la tarea: 4 a 6 ítems sin el botón de significado. No llega a la regla de 2 fallos, pero dependió de la ayuda en los dos temas.
+  3. Terminar la Lección 2 con la parte de voz: conversación «All about me» con sus propios datos y la prueba de oído, que todavía no hace, para aplicar la regla del 70 %. Además, revisar el guardado del progreso: que `open` traiga `dev` y que el `snap` refleje los pasos.
