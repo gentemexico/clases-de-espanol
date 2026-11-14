@@ -40,3 +40,14 @@ Sitio: https://gentemexico.github.io/clases-de-espanol/ · Registro: hoja «Clas
   1. Primero, el examen de colocación (sigue pendiente); el supuesto sigue en «principiante desde cero».
   2. Refuerzo corto de ser (yo soy / tú eres / él-ella es) y de las terminaciones de tú (-as/-es) en la tarea: 4 a 6 ítems sin el botón de significado. No llega a la regla de 2 fallos, pero dependió de la ayuda en los dos temas.
   3. Terminar la Lección 2 con la parte de voz: conversación «All about me» con sus propios datos y la prueba de oído, que todavía no hace, para aplicar la regla del 70 %. Además, revisar el guardado del progreso: que `open` traiga `dev` y que el `snap` refleje los pasos.
+
+### Reporte 14-nov-2026 (actividad del 13-nov, hora del Pacífico)
+- **Sesiones:** 0 sesiones con actividad. Solo 2 aperturas (00:05 y 00:08), cada una con un dispositivo nuevo, sin `leave`, sin vistas ni respuestas. Tiempo útil: ≈ 0 min.
+- **Qué hizo:** nada registrado: sin pasos, sets, lectura/escucha, conversación, prueba de oído, «Still learning» ni mini proyecto.
+- **Examen de colocación:** no aparece. **Tarea (hw):** 0/7.
+- **Errores repetidos / «Check my words»:** sin datos nuevos.
+- **Estado (último `snap`, 00:08):** todo en cero (Lección 2 en paso 0, sin sets ni warm-up), aunque el 12-nov ya hizo el warm-up 8/8 y el paso 3 de la Lección 2. **La alerta técnica sigue:** cada apertura llega con un `dev` nuevo y el `snap` no refleja el avance; el progreso no se está guardando entre visitas, así que el `snap` no sirve como fuente de verdad por ahora.
+- **Ajustes propuestos para la clase 3 (los aprueba el tutor):**
+  1. Antes de la clase, revisar el guardado del progreso en el navegador del alumno (modo privado, otro navegador o almacenamiento bloqueado); si no se corrige, que el alumno lo abra siempre desde el mismo navegador normal.
+  2. Mantener el orden ya propuesto: examen de colocación primero, luego refuerzo de ser (soy/eres/es) y terminaciones de tú (-as/-es) sin botón de significado.
+  3. Cerrar la Lección 2 con la conversación «All about me» y la prueba de oído (regla del 70 %), y dejar la tarea 1 asignada en clase para que haya al menos una casilla `hw` medible.
