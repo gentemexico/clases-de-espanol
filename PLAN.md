@@ -51,3 +51,16 @@ Sitio: https://gentemexico.github.io/clases-de-espanol/ · Registro: hoja «Clas
   1. Antes de la clase, revisar el guardado del progreso en el navegador del alumno (modo privado, otro navegador o almacenamiento bloqueado); si no se corrige, que el alumno lo abra siempre desde el mismo navegador normal.
   2. Mantener el orden ya propuesto: examen de colocación primero, luego refuerzo de ser (soy/eres/es) y terminaciones de tú (-as/-es) sin botón de significado.
   3. Cerrar la Lección 2 con la conversación «All about me» y la prueba de oído (regla del 70 %), y dejar la tarea 1 asignada en clase para que haya al menos una casilla `hw` medible.
+
+### Reporte 20-nov-2026 (actividad del 19-nov, hora del Pacífico)
+- **Sesiones:** 1 visita corta, 12:45–12:46 (≈ 1 min). Sin `open`/`leave`: los eventos siguen llegando con `dev`/`ses` nulos. Del 14 al 18-nov no hubo actividad.
+- **Qué hizo:** entró a la Lección 2 y usó «Check my words» con «Hola, me llamo Alex.»: captó todas las palabras (la transcripción incluyó un «Siri» al inicio, ruido del asistente de voz). Grabó la frase `ph0` (sin audio en el registro). Después solo navegó: Words, Listen, Progress, Words, Practice.
+- **Sin datos de:** pasos nuevos, sets, reproducciones en lectura/escucha, conversación, prueba de oído, «Still learning» ni mini proyecto.
+- **Examen de colocación:** no aparece. **Tarea (hw):** 0/7.
+- **Errores repetidos:** ninguno nuevo. Sigue el patrón del 12-nov: dependencia de ayuda en **ser** (soy/es) y **terminaciones de tú** (vives/llamas).
+- **«Check my words»:** 0 palabras no captadas. Mejora frente al 12-nov, cuando cambió «Alex» por su nombre.
+- **Estado (último `snap`, 13-nov 00:08):** todo en cero. No hay `snap` nuevo desde entonces; **la alerta técnica sigue**: el progreso no se guarda y el `snap` no sirve como fuente de verdad.
+- **Ajustes propuestos para la clase 3 (los aprueba el tutor):**
+  1. Corregir el registro antes de la clase: que cada visita mande `open` con `dev` estable y `snap` (revisar navegador del alumno: modo privado o almacenamiento bloqueado).
+  2. Hacer el examen de colocación en la clase, acompañado; lleva 8 días pendiente y el plan sigue en «principiante desde cero».
+  3. Aprovechar que ya graba y habla: cerrar la Lección 2 con la conversación «All about me» y la prueba de oído (regla del 70 %), más 4–6 ítems de ser (soy/eres/es) y tú (-as/-es) sin botón de significado; asignar la tarea 1 en clase.
