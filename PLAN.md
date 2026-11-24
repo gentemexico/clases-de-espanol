@@ -64,3 +64,16 @@ Sitio: https://gentemexico.github.io/clases-de-espanol/ · Registro: hoja «Clas
   1. Corregir el registro antes de la clase: que cada visita mande `open` con `dev` estable y `snap` (revisar navegador del alumno: modo privado o almacenamiento bloqueado).
   2. Hacer el examen de colocación en la clase, acompañado; lleva 8 días pendiente y el plan sigue en «principiante desde cero».
   3. Aprovechar que ya graba y habla: cerrar la Lección 2 con la conversación «All about me» y la prueba de oído (regla del 70 %), más 4–6 ítems de ser (soy/eres/es) y tú (-as/-es) sin botón de significado; asignar la tarea 1 en clase.
+
+### Reporte 23-nov-2026 (actividad del 23-nov, hora del Pacífico)
+- **Sesiones:** 1 visita corta, 08:33–08:35 (≈ 2 min). Sin `open`/`leave`: los eventos siguen llegando con `dev`/`ses` nulos. Del 20 al 22-nov no hubo actividad.
+- **Qué hizo:** Home → Lessons → Words → Listen. En Listen usó «Check my words» con «hola» y lo captó completo. Nada más.
+- **Sin datos de:** pasos nuevos, sets, reproducciones en lectura/escucha, conversación, prueba de oído, «Still learning» ni mini proyecto.
+- **Examen de colocación:** no aparece (11 días pendiente). **Tarea (hw):** 0/7.
+- **Errores repetidos:** ninguno nuevo. Sigue el patrón del 12-nov: dependencia de ayuda en **ser** (soy/es) y **terminaciones de tú** (vives/llamas).
+- **«Check my words»:** 0 palabras no captadas (tercera vez seguida sin fallos, aunque hoy fue una sola palabra).
+- **Estado (último `snap`, 13-nov 00:08):** todo en cero; no hay `snap` nuevo. **La alerta técnica sigue** (cuarto reporte): el progreso no se guarda y el `snap` no sirve como fuente de verdad.
+- **Ajustes propuestos para la clase 3 (los aprueba el tutor):**
+  1. Prioridad técnica: corregir el registro (que cada visita mande `open` con `dev` estable y `snap`); sin eso no se puede medir la tarea ni el avance.
+  2. Las visitas sueltas son de 1–2 min y solo exploran: hacer la clase 3 acompañada, con el examen de colocación al inicio.
+  3. Cerrar la Lección 2 en clase: conversación «All about me», prueba de oído (regla del 70 %) y 4–6 ítems de ser (soy/eres/es) y tú (-as/-es) sin botón de significado; dejar asignada la tarea 1 con una meta corta y diaria (5 min).
