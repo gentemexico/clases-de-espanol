@@ -89,3 +89,15 @@ Sitio: https://gentemexico.github.io/clases-de-espanol/ · Registro: hoja «Clas
   1. Antes de la clase, revisar con el alumno el navegador que usa: abrir el sitio en una ventana normal (no privada), siempre el mismo navegador, y comprobar que al recargar se conserva el paso; si no se puede, guardar el progreso del lado del registro (cambio al sitio que aprueba el tutor).
   2. Hacer la clase 3 acompañada: examen de colocación al inicio, luego 4–6 ítems de ser (soy/eres/es) y tú (-as/-es) sin botón de significado.
   3. Cerrar la Lección 2 en clase con la conversación «All about me» y la prueba de oído (regla del 70 %); dejar la tarea 1 asignada con una meta diaria de 5 min y que marque la casilla al terminar.
+
+### Reporte 26-nov-2026 (actividad del 25-nov, hora del Pacífico)
+- **Sesiones:** 1 apertura a las 11:00, sin vistas, respuestas ni `leave`. Tiempo útil: ≈ 0 min.
+- **Qué hizo:** nada registrado: sin pasos, sets, lectura/escucha, conversación, prueba de oído, «Still learning», «Check my words» ni mini proyecto.
+- **Examen de colocación:** no aparece (13 días pendiente). **Tarea (hw):** 0/7.
+- **Errores repetidos:** ninguno nuevo. Sigue el patrón del 12-nov: dependencia de ayuda en **ser** (soy/es) y **terminaciones de tú** (vives/llamas).
+- **Estado (último `snap`, 11:00):** todo en cero (Lección 2 en paso 0, sin warm-up ni sets).
+- **Alerta técnica:** la apertura trae otro `dev` nuevo (`cc1nkxmw`, el 5.º distinto desde el 24-nov). El navegador sigue sin conservar el progreso entre visitas.
+- **Ajustes propuestos para la clase 3 (los aprueba el tutor):**
+  1. Antes de la clase, resolver el guardado: mismo navegador, ventana normal, y comprobar que al recargar se conserva el paso; si no, guardar el progreso del lado del registro (cambio al sitio que aprueba el tutor).
+  2. Las aperturas sin interacción se repiten (24 y 25-nov): hacer la clase 3 acompañada, con el examen de colocación al inicio.
+  3. Cerrar la Lección 2 en clase: 4–6 ítems de ser (soy/eres/es) y tú (-as/-es) sin botón de significado, conversación «All about me» y prueba de oído (regla del 70 %); asignar la tarea 1 con meta diaria de 5 min.
